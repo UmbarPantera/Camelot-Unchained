@@ -6,7 +6,7 @@
   "dependencies": {
     "pre-commit": "^1.2.2",
     "tslint": "^5.1.0",
-    "typescript": "^2.2.2"
+    "typescript": "2.4.1"
   },
   "devDependencies": {
     "pre-commit": "^1.2.2",
