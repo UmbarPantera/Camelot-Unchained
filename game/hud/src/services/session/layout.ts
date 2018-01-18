@@ -34,9 +34,11 @@ import FriendlyTargetSiegeHealth from './layoutItems/FriendlyTargetSiegeHealth';
 import GameMenu from './layoutItems/GameMenu';
 import Options from './layoutItems/Options';
 import Scoreboard from './layoutItems/Scoreboard';
+import ScreenshotShare from './layoutItems/ScreenshotShare';
+import ScreenshotButton from './layoutItems/ScreenshotButton';
 
 const localStorageKey = 'cse_hud_layout-state';
-const FORCE_RESET_CODE = '0.7.1'; // if the local storage value for the reset code doesn't match this, then force a reset
+const FORCE_RESET_CODE = '0.7.2'; // if the local storage value for the reset code doesn't match this, then force a reset
 
 const CURRENT_STATE_VERSION: number = 6;
 const MIN_STATE_VERSION_ANCHORED: number = 5;
@@ -174,6 +176,12 @@ function initialState(): LayoutState {
     ],
     [
       'scoreboard', cloneDeep(Scoreboard),
+    ],
+    [
+      'screenshotShare', cloneDeep(ScreenshotShare),
+    ],
+    [
+      'screenshotButton', cloneDeep(ScreenshotButton),
     ],
   ]);
 
