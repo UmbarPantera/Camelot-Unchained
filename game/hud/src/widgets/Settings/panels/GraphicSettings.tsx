@@ -138,7 +138,7 @@ export class GraphicSettings extends React.Component<GraphicSettingsProps, Graph
         parseInt(graphics[FULL_SCREEN_HEIGHT_ID]);
       this.props.onSelectedDisplayModeChange({ width, height, fullScreen: on === 'true' });
     }
-    
+
     client.ChangeConfigVar(id, on);
     client.SaveConfigChanges();
     this.setState({ graphics: Object.assign({}, graphics, { [id]: on }) });
@@ -167,7 +167,7 @@ export class GraphicSettings extends React.Component<GraphicSettingsProps, Graph
 
   private getDropDownItemsDictionary = () => {
     const dropDownItems = {
-      [SELECT_RESOLUTION_ID]: this.state.displayModes.map((config) => getResolutionString(config)),
+      [SELECT_RESOLUTION_ID]: this.state.displayModes.map(config => getResolutionString(config)),
     };
 
     return dropDownItems;
