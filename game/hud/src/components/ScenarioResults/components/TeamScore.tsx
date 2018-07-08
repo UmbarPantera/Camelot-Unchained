@@ -84,6 +84,7 @@ const slideInFromRight = keyframes`
 const Container = styled('div')`
   position: relative;
   display: flex;
+  flex: 0 0 auto;
   justify-content: center;
   font-family: Caudex;
 `;
