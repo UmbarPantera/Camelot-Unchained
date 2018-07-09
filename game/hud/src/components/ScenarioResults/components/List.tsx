@@ -388,6 +388,11 @@ class List extends React.Component<ListProps, ListState> {
 
   private columnDefs: ColumnDefinition[] = [
     {
+      key: (m: TeamPlayer) =>  m.teamID.charAt(0),
+      title: 'Realm',
+      style: { boxSizing: 'border-box' },
+    },
+    {
       key: (m: TeamPlayer) => m.displayName,
       title: 'Name',
       style: { boxSizing: 'border-box' }, // only needed because code from old css-files is overwriting emotion stylesheets
@@ -478,6 +483,7 @@ class List extends React.Component<ListProps, ListState> {
             inputData={inputData}
             itemsPerPage={999}
             styles={ScenarioResultStyle}
+            resizeableColumns={true}
           />
         </Container>
       );
