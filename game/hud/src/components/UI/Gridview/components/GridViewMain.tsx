@@ -103,6 +103,7 @@ export const defaultGridViewStyle: GridViewStyle = {
     // label: 'Container',
     flex: '1 1 auto',
     display: 'flex',
+    position: 'relative',
     flexDirection: 'column',
     boxSizing: 'border-box',
     width: '100%',
@@ -526,6 +527,7 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
   private columnResizing: boolean = false;
   private resizeColumnIndex: number = -1;
   private resizeLineStartX: number = 0;
+  private containerLeft: number = 0;
   private gridContainerRef: HTMLDivElement = null;
   private reorderColumnRef: HTMLDivElement = null;
   private mouseMoveStartX: number = 0;
@@ -692,6 +694,7 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
     event: React.MouseEvent<HTMLDivElement>,
     columnIndex: number,
   ) => {
+    console.log('handle');
     if (this.props.resizeableColumns) {
       this.onColumnResizeBegin(
         event,
@@ -721,8 +724,9 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
   private onColumnResizeBegin = (event: React.MouseEvent<HTMLDivElement>, columnIndex: number) => {
     this.resizeColumnIndex = columnIndex;
     this.columnResizing = true;
-    this.resizeLineStartX = event.pageX;
-    const containerRect = this.tableWrapperRef.getBoundingClientRect();
+    const containerRect = this.containerRef.getBoundingClientRect();
+    this.containerLeft = containerRect.left;
+    this.resizeLineStartX = event.pageX - containerRect.left;
     this.resizeLine.style.height = containerRect.height + 'px';
     this.resizeLine.style.top = this.tableWrapperRef.offsetTop + 'px';
     this.resizeLine.style.left = this.resizeLineStartX + 'px';
@@ -732,7 +736,7 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
   }
 
   private onColumnResize = (event: MouseEvent) => {
-    this.resizeLine.style.left = event.pageX + 'px';
+    this.resizeLine.style.left = (event.pageX - this.containerLeft) + 'px';
   }
 
   private bindColumnResizeEvents = () => {
@@ -763,9 +767,9 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
       // if we are not handling a resize on the last column, we proceed. Otherwise no resize is done,
       // because this would cause "random" changes to the column widths
       if (lastColumnIndex !== this.resizeColumnIndex) {
-        const columnWidths = this.columnRefs.map(ref => ref.getBoundingClientRect().width);
+        // const columnWidths = this.columnRefs.map(ref => ref.getBoundingClientRect().width);
         const neighborColumnIndex = this.getNeighborColumnIndex(columnOrder, this.resizeColumnIndex);
-        let nextNeighborColumnWidth = columnWidths[neighborColumnIndex] - sizeChange;
+        let nextNeighborColumnWidth = this.columnRefs[neighborColumnIndex].getBoundingClientRect().width - sizeChange;
         const addedWidth = nextColumnWidth + nextNeighborColumnWidth;
         if (sizeChange > 0) {
           if (nextNeighborColumnWidth < 15) {
@@ -785,7 +789,11 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
           if (index === neighborColumnIndex) {
             return { ...columnStyle, width: nextNeighborColumnWidth, minWidth: nextNeighborColumnWidth };
           }
-          return { ...columnStyle, width: columnWidths[index], minWidth: columnWidths[index] };
+          if (this.columnRefs[index]) {
+            const columnWidth = this.columnRefs[index].getBoundingClientRect().width;
+            return { ...columnStyle, width: columnWidth, minWidth: columnWidth };
+          }
+          return columnStyle;
         });
       } else {
         nextColumnStyles = this.props.columnStyles;
@@ -825,13 +833,10 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
         });
       }
     }
-
-
     this.props.dispatch(Action.importColumnStyles(nextColumnStyles));
     this.resizeLine.style.display = 'none';
     this.containerRef.style.userSelect = 'auto';
     this.unbindColumnResizeEvents();
-
   }
 
   private getNeighborColumnIndex = (columnOrder: number[], columnIndex: number): number => {
