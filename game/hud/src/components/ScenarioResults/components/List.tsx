@@ -487,23 +487,8 @@ class List extends React.Component<ListProps, ListState> {
         </Container>
       );
     } else {
-      const teams: TeamInterface[] = [
-        {
-          teamID: 'Arthurian',
-          outcome: 'Lose',
-        },
-        {
-          teamID: 'Viking',
-          outcome: 'Lose',
-        },
-        {
-          teamID: 'Tuatha',
-          outcome: 'Win',
-        },
-      ];
-
+      const teams = this.createTeams();
       const inputData = this.createData();
-      // console.log(inputData);
       return (
         <Container>
           <TeamScore teams={/*this.props.*/teams} scenarioID={'Test-Scenario'/*this.props.scenarioID*/} />
@@ -647,6 +632,23 @@ class List extends React.Component<ListProps, ListState> {
       canceled: i,
       collected: i,
     });
+  }
+
+  private createTeams = (): TeamInterface[] => {
+    return [
+      {
+        teamID: 'Arthurian',
+        outcome: 'Lose',
+      },
+      {
+        teamID: 'Viking',
+        outcome: 'Lose',
+      },
+      {
+        teamID: 'Tuatha',
+        outcome: 'Win',
+      },
+    ];
   }
 
   // private onSortClick = (sortBy: SortBy, leastToGreatest: boolean) => {
