@@ -43,7 +43,10 @@ export const yScrollPosition = (
       }
       return s;
     }
-    case ActionTypeKeys.SET_CURRENT_PAGE: {
+    case ActionTypeKeys.SET_CURRENT_PAGE:
+    case ActionTypeKeys.SET_FILTER:
+    case ActionTypeKeys.SET_MULTIFILTER:
+    case ActionTypeKeys.SET_GLOBAL_FILTER: {
       return 0;
     }
     default: return s;

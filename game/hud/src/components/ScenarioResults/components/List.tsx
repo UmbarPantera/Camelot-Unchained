@@ -454,9 +454,39 @@ class List extends React.Component<ListProps, ListState> {
   }
 
   public render() {
-    const { /*players, teams,*/status, visible } = this.props;
-    if (true) /*!_.isEmpty(players) && !_.isEmpty(teams) && !status.loading && status.lastError === 'OK')*/ {
-      // const displayedPlayers = this.getDisplayedPlayers();
+    const { players, teams, status, visible } = this.props;
+    if (!_.isEmpty(players) && !_.isEmpty(teams) && !status.loading && status.lastError === 'OK') {
+      return (
+        <Container>
+          <TeamScore teams={this.props.teams} scenarioID={this.props.scenarioID} />
+          <GridView
+            columnDefs={this.columnDefs}
+            visible={visible}
+            inputData={this.props.players}
+            itemsPerPage={999}
+            styles={ScenarioResultStyle}
+            resizeableColumns={true}
+          />
+        </Container>
+      );
+    } else if (status.loading) {
+      return (
+        <Container>
+          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
+            <NoDataText>Fetching data for Scenario...</NoDataText>
+          </ListContainer>
+        </Container>
+      );
+    } else if (this.props.scenarioID !== '' && status.lastError !== 'OK') {
+      return (
+        <Container>
+          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
+            <NoDataText>There was an error fetching data about a recent Scenario...</NoDataText>
+            <NoDataText>{status.lastError}</NoDataText>
+          </ListContainer>
+        </Container>
+      );
+    } else {
       const teams: TeamInterface[] = [
         {
           teamID: 'Arthurian',
@@ -485,31 +515,6 @@ class List extends React.Component<ListProps, ListState> {
             styles={ScenarioResultStyle}
             resizeableColumns={true}
           />
-        </Container>
-      );
-    } else if (status.loading) {
-      return (
-        <Container>
-          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
-            <NoDataText>Fetching data for Scenario...</NoDataText>
-          </ListContainer>
-        </Container>
-      );
-    } else if (this.props.scenarioID !== '' && status.lastError !== 'OK') {
-      return (
-        <Container>
-          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
-            <NoDataText>There was an error fetching data about a recent Scenario...</NoDataText>
-            <NoDataText>{status.lastError}</NoDataText>
-          </ListContainer>
-        </Container>
-      );
-    } else {
-      return (
-        <Container>
-          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
-            <NoDataText>No data for any recent Scenarios</NoDataText>
-          </ListContainer>
         </Container>
       );
     }

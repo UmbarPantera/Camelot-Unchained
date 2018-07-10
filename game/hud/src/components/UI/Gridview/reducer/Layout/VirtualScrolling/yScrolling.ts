@@ -22,7 +22,10 @@ export const yScrolling = (
   // rowExpanderHeight: number,
 ): number => {
   switch (a.type) {
-    case ActionTypeKeys.SET_CURRENT_PAGE: {
+    case ActionTypeKeys.SET_CURRENT_PAGE:
+    case ActionTypeKeys.SET_FILTER:
+    case ActionTypeKeys.SET_MULTIFILTER:
+    case ActionTypeKeys.SET_GLOBAL_FILTER: {
       return 0;
     }
 
