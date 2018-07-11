@@ -14,8 +14,9 @@ import {
   getHasExpander, getRowIDKey, getSelectedRowIDs, getExpandedRowIDs, getScrollbarWidth, getXScrollbarVisible, getRowHeight,
   getGridHeight, getVirtualYScrollIndex, getScrollContainerHeight, getLeftXPlaceholderWidth, getRightXPlaceholderWidth,
   getRowExpansionHeight, getAllowVirtualYScrolling, getTopPlaceholderHeight, getVirtualExpandedRows, getItemsPPP,
+  getLastAction,
 } from '../reducer/reducer';
-import { onGridContextMenu } from '../reducer/actions';
+import { onGridContextMenu, ActionTypes, ActionTypeKeys } from '../reducer/actions';
 // import { shallowDiffersWithLog } from '../utils';
 
 
@@ -43,6 +44,7 @@ export interface GridConnectedProps {
   allowVirtualYScrolling: boolean;
   topPlaceholderHeight: number;
   virtualExpandedRows: boolean;
+  lastAction: ActionTypes;
 }
 
 export interface GridOwnProps {
@@ -90,6 +92,7 @@ const select = (state: GridViewState, ownProps: GridOwnProps): GridConnectedProp
     allowVirtualYScrolling: getAllowVirtualYScrolling(state),
     topPlaceholderHeight: getTopPlaceholderHeight(state),
     virtualExpandedRows: getVirtualExpandedRows(state),
+    lastAction: getLastAction(state),
   });
 };
 
@@ -198,12 +201,16 @@ export class Grid extends React.Component<GridProps, {}> {
   //   return shouldUpdate;
   // }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps: GridProps) {
     // need to update the scroll position after the new grid has rendered because we have to wait till the scroll bar
     // adapted to the new length of the grid
     // only the scrollContainer has this.gridContainerRef so we do not need
     // && props.scrollableTablePart && !props.areFrozenRows
-    if (this.gridContainerRef && this.props.yScrollPosition !== this.gridContainerRef.scrollTop) {
+    if (
+      this.props.lastAction.type !== ActionTypeKeys.SET_Y_SCROLL_POSITION
+      && this.gridContainerRef
+      && this.props.yScrollPosition !== this.gridContainerRef.scrollTop
+    ) {
       this.gridContainerRef.scrollTop = this.props.yScrollPosition;
     }
   }

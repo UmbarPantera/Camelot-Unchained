@@ -103,8 +103,8 @@ export const defaultGridViewStyle: GridViewStyle = {
     // label: 'Container',
     flex: '1 1 auto',
     display: 'flex',
-    position: 'relative',
     flexDirection: 'column',
+    position: 'relative',
     boxSizing: 'border-box',
     width: '100%',
     height: '100%',
@@ -694,7 +694,6 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
     event: React.MouseEvent<HTMLDivElement>,
     columnIndex: number,
   ) => {
-    console.log('handle');
     if (this.props.resizeableColumns) {
       this.onColumnResizeBegin(
         event,

@@ -9,11 +9,11 @@ import * as React from 'react';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
-
+// import logger from 'redux-logger';
 import reducer from './reducer/reducer';
 import App, { AppProps } from './components/App';
 
-const store = createStore(reducer, applyMiddleware(thunk));
+const store = createStore(reducer, applyMiddleware(thunk)); // , logger));
 
 export const GridViewTable = (props: AppProps) => {
   if (props.getStore) props.getStore(store);

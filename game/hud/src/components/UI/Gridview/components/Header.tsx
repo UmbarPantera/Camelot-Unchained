@@ -11,6 +11,7 @@ import { find, findIndex } from 'lodash';
 import { ExtendedColumnDef, GridViewSort, SortInfo, ColumnGroupType, GridViewClassNames } from './GridViewMain';
 import * as Reducer from '../reducer/reducer';
 import { onHeaderContextMenu, setMultiSort, columnReordering, setReorderColumn } from '../reducer/actions';
+// import { shallowDiffersWithLog } from '../utils';
 
 
 export interface HeaderConnectedProps {
@@ -60,6 +61,7 @@ export class Header extends React.Component<HeaderProps, {}> {
 
   public render() {
     const props = this.props;
+    // console.log('Header');
     const headerItems: JSX.Element[] = [];
     if (props.hasExpander && props.columnGroupType !== ColumnGroupType.Dummy && props.columnDefs.length) {
       headerItems.push((
@@ -133,6 +135,10 @@ export class Header extends React.Component<HeaderProps, {}> {
       </div>
     );
   }
+
+  // public shouldComponentUpdate(nextProps: HeaderProps) {
+  //   return shallowDiffersWithLog(this.props, nextProps);
+  // }
 
   public componentWillUnmount() {
     clearTimeout(this.reorderTimer);

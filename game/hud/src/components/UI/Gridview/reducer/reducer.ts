@@ -27,6 +27,7 @@ export interface GridViewState {
   layout: fromLayout.LayoutState;
   contextMenu: fromContextMenu.ContextMenuState;
   measure: fromMeasure.MeasureState;
+  lastAction: ActionTypes;
 }
 
 export const reducer = (s: GridViewState = initialState(), a: ActionTypes): GridViewState => {
@@ -40,6 +41,7 @@ export const reducer = (s: GridViewState = initialState(), a: ActionTypes): Grid
     layout: layout(s.layout, a, s, fromData.getOutputIDs(nextData), nextColumns),
     contextMenu: contextMenu(s.contextMenu, a),
     measure: measure(s.measure, a, s),
+    lastAction: a,
   };
 };
 
@@ -54,6 +56,7 @@ export const initialState = (): GridViewState => {
     layout: fromLayout.initialState(),
     contextMenu: fromContextMenu.initialState(),
     measure: fromMeasure.initialState(),
+    lastAction: null,
   };
 };
 
@@ -143,7 +146,7 @@ export const getColumnReordering = (s: GridViewState): boolean => {
 };
 
 export const getSelectedRowIDs = (s: GridViewState): string[] => {
-  return getSelectableRows(s) ? fromLayout.getSelectedRowIDs(s.layout) : [];
+  return fromLayout.getSelectedRowIDs(s.layout);
 };
 
 export const getExpandedRowIDs = (s: GridViewState): string[] => {
@@ -273,6 +276,7 @@ export const getCalculateItemsPerPage = (s: GridViewState): boolean => {
   return fromSettings.getCalculateItemsPerPage(s.settings);
 };
 
+// not needed atm
 export const getSelectableRows = (s: GridViewState): boolean => {
   return fromSettings.getSelectableRows(s.settings);
 };
@@ -387,6 +391,13 @@ export const getNeedRowExpansionHeight = (s: GridViewState): boolean => {
   return fromMeasure.getNeedRowExpansionHeight(s.measure);
 };
 
+/*
+ *   Last Action
+ */
+
+export const getLastAction = (s: GridViewState): ActionTypes => {
+  return s.lastAction;
+};
 
 /*
  *  CALCULATED GETTERS

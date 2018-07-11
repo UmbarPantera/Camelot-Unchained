@@ -151,11 +151,10 @@ export class Row extends React.Component<RowProps, {}> {
   }
 
 
-  /*public shouldComponentUpdate(nextProps: RowProps) {
-    console.log('RowUpdate');
-    const shouldUpdate = shallowDiffersWithLog(this.props, nextProps);
-    return shouldUpdate;
-  }*/
+  // public shouldComponentUpdate(nextProps: RowProps) {
+  //   console.log('RowUpdate: ' + this.props.rowIDKey(this.props.item));
+  //   return shallowDiffersWithLog(this.props, nextProps);
+  // }
 
   private onClickExpander = (rowID: string, e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();

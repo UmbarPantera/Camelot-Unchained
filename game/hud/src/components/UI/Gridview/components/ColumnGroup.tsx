@@ -104,10 +104,8 @@ export class ColumnGroup extends React.Component<ColumnGroupProps, {}> {
           <Header
             columnDefs={props.columnDefs}
             columnGroupType={props.columnGroupType}
-            handleMouseDownResize={(e: React.MouseEvent<HTMLDivElement>, columnIndex: number) =>
-              props.handleMouseDownColumnResizer(e, columnIndex)}
-            handleMouseDownReorder={(e: React.MouseEvent<HTMLDivElement>, columnIndex: number) =>
-              props.handleMouseDownColumnHeader(e, columnIndex)}
+            handleMouseDownResize={props.handleMouseDownColumnResizer}
+            handleMouseDownReorder={props.handleMouseDownColumnHeader}
             columnRef={props.columnRefs}
             classNameObject={props.classNameObject}
           />

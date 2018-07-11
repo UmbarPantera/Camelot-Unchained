@@ -9,7 +9,7 @@ import { Store }from 'redux';
 import { isEqual } from 'lodash';
 import * as Action from '../reducer/actions';
 import GridViewMain, {
-  ExtendedColumnDef, GridViewStyle, ColumnGroupType, SortInfo, ColumnDefinition,
+  GridViewStyle, ColumnGroupType, SortInfo, ColumnDefinition,
 } from './GridViewMain';
 import { SettingState } from '../reducer/settings';
 import { AlterContextMenu, ContextMenuItem } from './index';
@@ -21,20 +21,14 @@ export interface AppProps {
   visible: boolean;
   inputData?: any;
   frozenColumns?: number[];
-  scrollableColumns?: number[]; // still needed?
   hiddenColumns?: number[];
-  frozenColumnDefs?: ExtendedColumnDef[];
-  scrollableColumnDefs?: ExtendedColumnDef[];
-  renderData?: {
-    [id: string]: any,
-  };
+  renderData?: {[id: string]: any};
   rowExpansionTemplate?: (items: any, columnGroupType: ColumnGroupType) => JSX.Element;
   styles?: Partial<GridViewStyle>;
   frozenRowIDs?: string[];
   globalFilter?: string;
   filterArray?: string[]; // filterArray.length needs to be the same as columnDefinition.length. Use '' for empty filter
   multiSort?: SortInfo[];
-  outputItems?: any[];
   // userPermissions?: ql.PermissionInfo[];
   alterContextMenu?: (contextMenuInfo: AlterContextMenu) => ContextMenuItem[];
   rowIDKey?: (item: any) => any;
@@ -53,12 +47,8 @@ export interface AppProps {
   per page possible (needed for y- scrollbar and if you calculate the itemsPerPage) and the width available for
   x-scrolling are not recalculated, which means the scrollbars won't work correctly or we get an hidden overflow*/
   changedContainerDimensions?: boolean;
-  onChangedMultiFilter?: (e: React.FormEvent<HTMLInputElement>, columnIndex: number) => void;
-  onSelectionChanged?: (selectedRows: string[]) => void;
-  columnStyles?: React.CSSProperties[];
   currentPage?: number;
   itemsPerPage?: number;
-  columnReordering?: boolean;
   selectedRowIDs?: string[];
   expandedRowIDs?: string[];
   getStore?: (store: Store<GridViewState>) => void;
@@ -93,6 +83,10 @@ class App extends React.Component<AppProps, {}> {
     if (props.itemsPerPage) props.dispatch(Action.setItemsPerPage(props.itemsPerPage));
     if (props.frozenColumns) props.dispatch(Action.setFrozenColumns(props.frozenColumns));
     if (props.hiddenColumns) props.dispatch(Action.setHiddenColumns(props.hiddenColumns));
+
+    if (props.currentPage) props.dispatch(Action.setCurrentPage(props.currentPage));
+    if (props.selectedRowIDs) props.dispatch(Action.setSelectedRowIDs(props.selectedRowIDs));
+    if (props.expandedRowIDs) props.dispatch(Action.setExpandedRowIDs(props.expandedRowIDs));
   }
 
   public render() {
@@ -119,7 +113,16 @@ class App extends React.Component<AppProps, {}> {
       props.dispatch(Action.setHiddenColumns(nextProps.hiddenColumns));
     }
     if (nextProps.changedContainerDimensions && props.changedContainerDimensions) {
-      props.dispatch(Action.onScrollContainerChangedDimensions(props.changedContainerDimensions));
+      props.dispatch(Action.onScrollContainerChangedDimensions(nextProps.changedContainerDimensions));
+    }
+    if (nextProps.currentPage !== props.currentPage) {
+      props.dispatch(Action.setCurrentPage(nextProps.currentPage));
+    }
+    if (!isEqual(props.selectedRowIDs, nextProps.selectedRowIDs)) {
+      props.dispatch(Action.setSelectedRowIDs(props.selectedRowIDs));
+    }
+    if (!isEqual(props.expandedRowIDs, nextProps.expandedRowIDs)) {
+      props.dispatch(Action.setExpandedRowIDs(props.expandedRowIDs));
     }
   }
 }
