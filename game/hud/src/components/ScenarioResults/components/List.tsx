@@ -472,9 +472,15 @@ class List extends React.Component<ListProps, ListState> {
     } else if (status.loading) {
       return (
         <Container>
-          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
-            <NoDataText>Fetching data for Scenario...</NoDataText>
-          </ListContainer>
+          <TeamScore teams={this.createTeams()} scenarioID={'Test-Scenario'/*this.props.scenarioID*/} />
+          <GridView
+            columnDefs={this.columnDefs}
+            visible={visible}
+            inputData={this.createData()}
+            itemsPerPage={999}
+            styles={ScenarioResultStyle}
+            resizeableColumns={true}
+          />
         </Container>
       );
     } else if (this.props.scenarioID !== '' && status.lastError !== 'OK') {
@@ -488,14 +494,13 @@ class List extends React.Component<ListProps, ListState> {
       );
     } else {
       const teams = this.createTeams();
-      const inputData = this.createData();
       return (
         <Container>
           <TeamScore teams={/*this.props.*/teams} scenarioID={'Test-Scenario'/*this.props.scenarioID*/} />
           <GridView
             columnDefs={this.columnDefs}
             visible={visible}
-            inputData={inputData}
+            inputData={this.createData()}
             itemsPerPage={999}
             styles={ScenarioResultStyle}
             resizeableColumns={true}
