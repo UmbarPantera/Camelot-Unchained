@@ -6,7 +6,7 @@
 
 import * as React from 'react';
 import { connect } from 'react-redux';
-import styled, { cx, css } from 'react-emotion';
+import styled, { cx } from 'react-emotion';
 import { ExtendedColumnDef, ColumnGroupType, GridViewClassNames } from './GridViewMain';
 import Row from './Row';
 import {
@@ -14,15 +14,16 @@ import {
   getHasExpander, getRowIDKey, getSelectedRowIDs, getExpandedRowIDs, getScrollbarWidth, getXScrollbarVisible, getRowHeight,
   getGridHeight, getVirtualYScrollIndex, getScrollContainerHeight, getLeftXPlaceholderWidth, getRightXPlaceholderWidth,
   getRowExpansionHeight, getAllowVirtualYScrolling, getTopPlaceholderHeight, getVirtualExpandedRows, getItemsPPP,
-  getLastAction,
+  getLastAction, getScrollContainerWidth, getGridWidth, getXScrollPosition,
 } from '../reducer/reducer';
-import { onGridContextMenu, ActionTypes, ActionTypeKeys } from '../reducer/actions';
+import { onGridContextMenu, ActionTypes, ActionTypeKeys, setXScrollPosition, setYScrollPosition } from '../reducer/actions';
 // import { shallowDiffersWithLog } from '../utils';
 
 
 
 export interface GridConnectedProps {
   renderData: any;
+  xScrollPosition: number;
   yScrollPosition: number;
   reorderColumnIndex: number;
   columnReordering: boolean;
@@ -36,11 +37,13 @@ export interface GridConnectedProps {
   rowHeight: number;
   rowExpansionHeight: number;
   gridHeight: number;
+  gridWidth: number;
   virtualYScrollIndex: number;
+  scrollContainerWidth: number;
   scrollContainerHeight: number;
   leftXPlaceholderWidth: number;
   rightXPlaceholderWidth: number;
-  itemsPerPage: number;
+  itemsPPP: number;
   allowVirtualYScrolling: boolean;
   topPlaceholderHeight: number;
   virtualExpandedRows: boolean;
@@ -57,7 +60,6 @@ export interface GridOwnProps {
   gridRef: (r: HTMLDivElement) => void;
   classNameObject: GridViewClassNames;
   gridContainerRef?: (r: HTMLDivElement) => void; // needed on the scroll container
-  onScroll?: (yScrollPosition: number) => void; // needed on the scroll container
   yScrollbarVisible: boolean;
   rowExpansionRef?: (rowExpansionRef: HTMLDivElement) => void;
 }
@@ -69,6 +71,9 @@ export interface GridProps extends GridOwnProps, GridConnectedProps {
 const select = (state: GridViewState, ownProps: GridOwnProps): GridConnectedProps => {
   return ({
     renderData: getRenderData(state),
+    xScrollPosition: !ownProps.areFrozenRows && ownProps.columnGroupType !== ColumnGroupType.Dummy
+      ? getXScrollPosition(state)
+      : 0,
     yScrollPosition: !ownProps.areFrozenRows && ownProps.columnGroupType !== ColumnGroupType.Dummy
       ? getYScrollPosition(state)
       : 0,
@@ -84,11 +89,13 @@ const select = (state: GridViewState, ownProps: GridOwnProps): GridConnectedProp
     rowHeight: ownProps.items.length ? getRowHeight(state) : null,
     rowExpansionHeight: getRowExpansionHeight(state),
     gridHeight: getGridHeight(state),
+    gridWidth: getGridWidth(state),
     virtualYScrollIndex: getVirtualYScrollIndex(state),
+    scrollContainerWidth: getScrollContainerWidth(state),
     scrollContainerHeight: getScrollContainerHeight(state),
     leftXPlaceholderWidth: getLeftXPlaceholderWidth(state),
     rightXPlaceholderWidth: getRightXPlaceholderWidth(state),
-    itemsPerPage: getItemsPPP(state), // ownProps.xScrollbarVisible ? getItemsPPPWScrollbar(state) : getItemsPPP(state),
+    itemsPPP: getItemsPPP(state), // ownProps.xScrollbarVisible ? getItemsPPPWScrollbar(state) : getItemsPPP(state),
     allowVirtualYScrolling: getAllowVirtualYScrolling(state),
     topPlaceholderHeight: getTopPlaceholderHeight(state),
     virtualExpandedRows: getVirtualExpandedRows(state),
@@ -96,21 +103,51 @@ const select = (state: GridViewState, ownProps: GridOwnProps): GridConnectedProp
   });
 };
 
-const RowContainer = styled('div') `
+interface GridWrapperProps {
+  xScrollbarVisible: boolean;
+  yScrollbarVisible: boolean;
+  scrollbarWidth: number;
+}
+
+const GridWrapper = styled('div') `
   display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
+  flex: 0 0 auto;
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  right: ${(props: GridWrapperProps) => props.yScrollbarVisible ? props.scrollbarWidth : 0}px;
+  bottom: ${(props: GridWrapperProps) => props.xScrollbarVisible ? props.scrollbarWidth : 0}px;
+  left: 0;
+ `;
+
+const Container = styled('div') `
+  display: flex;
+  flex: 1 1 auto;
+  overflow: hidden;
+  position: relative;
 `;
 
+interface GridBodyProps {
+  height: number | string;
+  width: number;
+}
+
+const GridBody = styled('div')`
+  display: flex;
+  flex: 0 0 auto;
+  height: ${(props: GridBodyProps) => props.height}px;
+  width: ${(props: GridBodyProps) => props.width}px;
+`;
 
 export class Grid extends React.Component<GridProps, {}> {
-  private gridContainerRef: HTMLDivElement = null;
+  private scrollContainerRef: HTMLDivElement = null;
 
   constructor(props: GridProps) {
     super(props);
   }
 
   public render() {
+    // console.log('Grid');
     const props = this.props;
     const isScrollContainer = props.columnGroupType === ColumnGroupType.Scrollable && !props.areFrozenRows;
     const rows: JSX.Element[] = !props.areFrozenRows && props.allowVirtualYScrolling
@@ -139,59 +176,49 @@ export class Grid extends React.Component<GridProps, {}> {
           />
         );
       });
+    // console.log(rows);
+    // const totalHeight = props.virtualExpandedRows ? props.rowHeight + props.rowExpansionHeight : props.rowHeight;
 
-    const needPlaceholders = props.columnGroupType === ColumnGroupType.Scrollable
-      && !props.areFrozenRows
-      && props.xScrollbarVisible;
+    // console.log(props.gridWidth);
+    // console.log(props.gridHeight);
+    // console.log(totalHeight);
+    // console.log(props.rowHeight);
+
     return (
-      <div
-        className={cx(
-          props.classNameObject.gridContainer,
-          isScrollContainer && props.xScrollbarVisible && props.classNameObject.gridContainerXScroll,
-          isScrollContainer && props.yScrollbarVisible && props.classNameObject.gridContainerYScroll,
-          props.areFrozenRows && props.classNameObject.frozen,
-        )}
-        style={props.xScrollbarVisible
-          && !props.areFrozenRows
-          && props.columnGroupType === ColumnGroupType.Frozen
-          ? { marginBottom: props.scrollbarWidth + 'px' }
-          : {}
-        }
-        ref={(r) => { if (props.gridContainerRef) { props.gridContainerRef(r); this.gridContainerRef = r; } }}
-        onScroll={() => props.onScroll(props.yScrollPosition)}
-      >
+      <Container innerRef={(r: HTMLDivElement) => { if (props.gridContainerRef) props.gridContainerRef(r); }}>
         <div
           className={cx(
-            props.classNameObject.grid,
-            isScrollContainer && css`
-              min-height: ${props.gridHeight}px;
-            `,
+            props.classNameObject.gridContainer,
+            isScrollContainer && props.xScrollbarVisible && props.classNameObject.gridContainerXScroll,
+            isScrollContainer && props.yScrollbarVisible && props.classNameObject.gridContainerYScroll,
+            props.areFrozenRows && props.classNameObject.frozen,
           )}
-          style={
-            props.columnGroupType === ColumnGroupType.Frozen && !props.areFrozenRows && props.yScrollbarVisible
-              ? { marginTop: '-' + props.yScrollPosition + 'px' }
-              : {}
+          style={props.xScrollbarVisible
+            && !props.areFrozenRows
+            && props.columnGroupType === ColumnGroupType.Frozen
+            ? { marginBottom: props.scrollbarWidth + 'px' }
+            : {}
           }
-          ref={(r) => { if (isScrollContainer) props.gridRef(r); }}
+          ref={(r) => { if (isScrollContainer) this.scrollContainerRef = r; }}
         >
-          {needPlaceholders && props.leftXPlaceholderWidth > 0 && <div
-            key={'xPlaceholderLeft'}
-            style={{
-              minWidth: props.leftXPlaceholderWidth,
-            }}
-          />}
-          <RowContainer>
-            {rows}
-          </RowContainer>
-          {needPlaceholders && <div
-            key={'xPlaceholderRight'}
-            style={{
-              display: 'flex',
-              minWidth: props.rightXPlaceholderWidth,
-            }}
-          />}
+          <GridBody height={this.props.gridHeight ? this.props.gridHeight : '100%'} width={props.gridWidth} />
         </div>
-      </div>
+        <GridWrapper
+          xScrollbarVisible={props.xScrollbarVisible}
+          yScrollbarVisible={props.yScrollbarVisible}
+          scrollbarWidth={props.scrollbarWidth}
+        >
+          <div
+            className={props.classNameObject.grid}
+            ref={(r) => { if (isScrollContainer) { props.gridRef(r); } }}
+            style={{
+              marginLeft: props.leftXPlaceholderWidth - props.xScrollPosition,
+            }}
+          >
+            {rows}
+          </div>
+        </GridWrapper>
+    </Container>
     );
   }
 
@@ -201,6 +228,18 @@ export class Grid extends React.Component<GridProps, {}> {
   //   return shouldUpdate;
   // }
 
+  public componentDidMount() {
+    if (this.scrollContainerRef) {
+      this.scrollContainerRef.addEventListener('scroll', this.onScroll, { passive: true });
+      // this.gridRef.addEventListener('wheel', this.onScrollStart, { passive: true });
+    }
+  }
+
+  public componentWillUnmount() {
+    this.scrollContainerRef.removeEventListener('scroll', this.onScroll);
+    // this.gridRef.removeEventListener('wheel', this.onScrollStart);
+  }
+
   public componentDidUpdate(prevProps: GridProps) {
     // need to update the scroll position after the new grid has rendered because we have to wait till the scroll bar
     // adapted to the new length of the grid
@@ -208,10 +247,10 @@ export class Grid extends React.Component<GridProps, {}> {
     // && props.scrollableTablePart && !props.areFrozenRows
     if (
       this.props.lastAction.type !== ActionTypeKeys.SET_Y_SCROLL_POSITION
-      && this.gridContainerRef
-      && this.props.yScrollPosition !== this.gridContainerRef.scrollTop
+      && this.scrollContainerRef
+      && this.props.yScrollPosition !== this.scrollContainerRef.scrollTop
     ) {
-      this.gridContainerRef.scrollTop = this.props.yScrollPosition;
+      this.scrollContainerRef.scrollTop = this.props.yScrollPosition;
     }
   }
 
@@ -236,18 +275,20 @@ export class Grid extends React.Component<GridProps, {}> {
 
   private getVirtualRows = (): JSX.Element[] => {
     const props = this.props;
-    const totalHeight = props.virtualExpandedRows ? props.rowHeight + props.rowExpansionHeight : props.rowHeight;
     const virtualRows: JSX.Element[] = [];
-    if (props.topPlaceholderHeight) {
-      virtualRows.push(
-        <div
-          key={'Placeholder Top'}
-          style={{ height: props.topPlaceholderHeight }}
-        />,
-      );
-    }
+    // if (props.topPlaceholderHeight) {
+    //   virtualRows.push(
+    //     <div
+    //       key={'Placeholder Top'}
+    //       style={{ height: props.topPlaceholderHeight }}
+    //     />,
+    //   );
+    // }
     let i;
-    const itemsPerPage = props.itemsPerPage + 2;
+    const itemsPerPage = props.itemsPPP + 1;
+    // // console.log('items: ' + itemsPerPage);
+    // // console.log('vIndex: ' + props.virtualYScrollIndex);
+    // // console.log(props.items);
     for (i = props.virtualYScrollIndex; i < props.virtualYScrollIndex + itemsPerPage && i < props.items.length; i++) {
       virtualRows.push(
         <Row
@@ -271,17 +312,27 @@ export class Grid extends React.Component<GridProps, {}> {
         />,
       );
     }
-    const remainingHeight = props.gridHeight - props.topPlaceholderHeight - (i - props.virtualYScrollIndex) * totalHeight;
-    virtualRows.push(
-      <div
-        key={'Placeholder Bottom'}
-        style={{ height: remainingHeight }}
-      />,
-    );
+    // const remainingHeight = props.gridHeight - props.topPlaceholderHeight - (i - props.virtualYScrollIndex) * totalHeight;
+    // virtualRows.push(
+    //   <div
+    //     key={'Placeholder Bottom'}
+    //     style={{ height: remainingHeight }}
+    //   />,
+    // );
 
     return virtualRows;
   }
 
+  private onScroll = (e?: any) => {
+    // console.log(e.target);
+    const nextYScrollPosition = e ? e.target.scrollTop : this.scrollContainerRef.scrollTop;
+    if (nextYScrollPosition !== this.props.yScrollPosition) {
+      window.requestAnimationFrame(() => this.props.dispatch(setYScrollPosition(nextYScrollPosition)));
+    } else {
+      const nextXScrollPosition = e ? e.target.scrollLeft : this.scrollContainerRef.scrollLeft;
+      window.requestAnimationFrame(() => this.props.dispatch(setXScrollPosition(nextXScrollPosition)));
+    }
+  }
 }
 
 export default connect(select)(Grid);

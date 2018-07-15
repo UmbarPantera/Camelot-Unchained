@@ -7,7 +7,7 @@
 
 import * as React from 'react';
 import * as _ from 'lodash';
-import styled, { css } from 'react-emotion';
+import styled from 'react-emotion';
 
 // import { FactionColors } from 'lib/factionColors';
 // import SearchableList from '../../SearchableList';
@@ -203,8 +203,10 @@ export const ScenarioResultStyle: Partial<GridViewStyle> = {
     // label: 'Grid',
     display: 'flex',
     flex: '0 0 auto',
-    flexDirection: 'row',
+    flexDirection: 'column',
     minWidth: 'fit-content',
+    minHeight: 'fit-content',
+    maxHeight: 'fit-content',
   },
 
   gridItem: {
@@ -336,35 +338,35 @@ const Container = styled('div') `
   -webkit-mask-repeat: no-repeat;
 `;
 
-const ListContainer = css`
-  height: 500px;
-  &::-webkit-scrollbar {
-    width: 7px !important;
-  }
-  &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3) !important;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #222, #333, #222) !important;
-    box-shadow: none !important;
-  }
-`;
+// const ListContainer = css`
+//   height: 500px;
+//   &::-webkit-scrollbar {
+//     width: 7px !important;
+//   }
+//   &::-webkit-scrollbar-track {
+//     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3) !important;
+//   }
+//   &::-webkit-scrollbar-thumb {
+//     background: linear-gradient(to bottom, #222, #333, #222) !important;
+//     box-shadow: none !important;
+//   }
+// `;
 
 // const ListItemsContainer = css`
 //   padding: 0px 5px 0px 5px;
 //   -webkit-mask-image: linear-gradient(to top, transparent 0%, black 4%);
 // `;
 
-const NoDataText = styled('div')`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  font-size: 18px;
-  font-family: Caudex;
-  color: white;
-`;
+// const NoDataText = styled('div')`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   height: 100%;
+//   width: 100%;
+//   font-size: 18px;
+//   font-family: Caudex;
+//   color: white;
+// `;
 
 export interface ListProps {
   scenarioID: string;
@@ -384,7 +386,7 @@ export interface ListState {
 }
 
 class List extends React.Component<ListProps, ListState> {
-  private listRef: HTMLDivElement;
+  // private listRef: HTMLDivElement;
 
   private columnDefs: ColumnDefinition[] = [
     {
@@ -466,6 +468,7 @@ class List extends React.Component<ListProps, ListState> {
             itemsPerPage={999}
             styles={ScenarioResultStyle}
             resizeableColumns={true}
+            fixedTableWidth={false}
           />
         </Container>
       );
@@ -480,16 +483,23 @@ class List extends React.Component<ListProps, ListState> {
             itemsPerPage={999}
             styles={ScenarioResultStyle}
             resizeableColumns={true}
+            fixedTableWidth={false}
           />
         </Container>
       );
     } else if (this.props.scenarioID !== '' && status.lastError !== 'OK') {
       return (
         <Container>
-          <ListContainer innerRef={(r: HTMLDivElement) => this.listRef = r}>
-            <NoDataText>There was an error fetching data about a recent Scenario...</NoDataText>
-            <NoDataText>{status.lastError}</NoDataText>
-          </ListContainer>
+          <TeamScore teams={this.createTeams()} scenarioID={'Test-Scenario'/*this.props.scenarioID*/} />
+          <GridView
+            columnDefs={this.columnDefs}
+            visible={visible}
+            inputData={this.createData()}
+            itemsPerPage={999}
+            styles={ScenarioResultStyle}
+            resizeableColumns={true}
+            fixedTableWidth={false}
+          />
         </Container>
       );
     } else {
@@ -504,6 +514,7 @@ class List extends React.Component<ListProps, ListState> {
             itemsPerPage={999}
             styles={ScenarioResultStyle}
             resizeableColumns={true}
+            fixedTableWidth={false}
           />
         </Container>
       );

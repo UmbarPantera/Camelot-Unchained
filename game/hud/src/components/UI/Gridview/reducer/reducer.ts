@@ -477,3 +477,12 @@ export const getTopPlaceholderHeight = (s: GridViewState): number => {
   return getAllowVirtualYScrolling ? fromLayout.getTopPlaceholderHeight(s.layout) : 0;
 };
 
+export const getGridWidth = createSelector(
+  [getScrollableColumns, getColumnStyles],
+  (scrollableColumns, columnStyles) => {
+    return scrollableColumns.reduce((sum, columnIndex) => {
+      return sum + (columnStyles[columnIndex].minWidth as number);
+    }, 0);
+  },
+);
+

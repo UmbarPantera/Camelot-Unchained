@@ -39,9 +39,13 @@ export const itemsPPPD = (
         const totalHeight = nextVirtualExpandedRows
           ? nextRowHeight + nextRowExpansionHeight
           : nextRowHeight;
-        const itemsPPPNoScrollbar = Math.floor(nextScrollContainerHeight / totalHeight) || 1;
+        const itemsPPPNoScrollbar = nextScrollContainerHeight && totalHeight
+          ? Math.floor(nextScrollContainerHeight / totalHeight)
+          : 1;
         // console.log('itemsPerPagePossible: ' + itemsPerPagePossible);
-        const itemsPPPWScrollbar = Math.floor((nextScrollContainerHeight - nextScrollbarWidth) / totalHeight) || 1;
+        const itemsPPPWScrollbar = nextScrollContainerHeight && totalHeight
+          ? Math.floor((nextScrollContainerHeight - nextScrollbarWidth) / totalHeight)
+          : 1;
       // console.log('itemsPPPWScrollbar: ' + itemsPPPWScrollbar);
         return {
           itemsPPPNoScrollbar,
@@ -73,8 +77,8 @@ export const itemsPPPD = (
 
 export const initialState = (): ItemsPPPDState => {
   return ({
-    itemsPPPNoScrollbar: 0,
-    itemsPPPWScrollbar: 0,
+    itemsPPPNoScrollbar: 1,
+    itemsPPPWScrollbar: 1,
   });
 };
 

@@ -37,7 +37,6 @@ export interface ColumnGroupOwnProps {
   columnDefs: ExtendedColumnDef[];
   xScrollbarVisible: boolean;
   yScrollbarVisible: boolean;
-  onScroll: (yScrollPosition: number) => void;
   handleMouseDownColumnResizer: (event: React.MouseEvent<HTMLDivElement>, columnIndex: number) => void;
   handleMouseDownColumnHeader: (event: React.MouseEvent<HTMLDivElement>, columnIndex: number) => void;
   columnRefs: (columnRef: HTMLDivElement, index: number) => void;
@@ -151,7 +150,6 @@ export class ColumnGroup extends React.Component<ColumnGroupProps, {}> {
          items={props.scrollableRows}
          scrollableTablePart={props.scrollable}
          areFrozenRows={false}
-         onScroll={props.onScroll}
          gridRef={this.getGridRef}
          gridContainerRef={props.gridContainerRef}
          classNameObject={props.classNameObject}
@@ -187,15 +185,23 @@ export class ColumnGroup extends React.Component<ColumnGroupProps, {}> {
   }
 
   private getRowHeight = () => {
-    if (this.gridRef && this.gridRef.firstChild && this.gridRef.firstChild.firstChild) {
-      const rowHeight = this.gridRef.firstChild.firstChild.firstChild.parentElement.getBoundingClientRect().height;
-      if (rowHeight) {
-        this.props.dispatch(setRowHeight(rowHeight));
+    // console.log(this.gridRef);
+    // console.log(this.props.needsRowHeight);
+    if (this.props.needsRowHeight) {
+      if (this.gridRef && this.gridRef.firstChild && this.gridRef.firstChild.firstChild) {
+        const rowHeight = this.gridRef.firstChild.firstChild.parentElement.getBoundingClientRect().height;
+        // console.log('rowHeight: ' + rowHeight);
+        // console.log(this.gridRef.firstChild.firstChild.firstChild.parentElement);
+        // alert(rowHeight);
+        if (rowHeight) {
+          this.props.dispatch(setRowHeight(rowHeight));
+        } else {
+          // console.log('looping');
+          setTimeout(() => this.getRowHeight(), 50);
+        }
       } else {
         setTimeout(() => this.getRowHeight(), 50);
       }
-    } else {
-      setTimeout(() => this.getRowHeight(), 50);
     }
   }
 

@@ -275,8 +275,10 @@ export const defaultGridViewStyle: GridViewStyle = {
     // label: 'Grid',
     display: 'flex',
     flex: '0 0 auto',
-    flexDirection: 'row',
+    flexDirection: 'column',
     minWidth: 'fit-content',
+    minHeight: 'fit-content',
+    maxHeight: 'fit-content',
   },
 
   gridItem: {
@@ -577,7 +579,6 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
           columnDefs={this.props.reorderColumnDef}
           xScrollbarVisible={this.props.xScrollbarVisible}
           yScrollbarVisible={this.props.yScrollbarVisible}
-          onScroll={this.onScroll}
           handleMouseDownColumnResizer={this.handleMouseDownColumnResizer}
           handleMouseDownColumnHeader={this.handleMouseDownColumnHeader}
           columnRefs={this.getColumnRefs}
@@ -597,7 +598,6 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
             columnDefs={this.props.frozenColumnDefs}
             xScrollbarVisible={this.props.xScrollbarVisible}
             yScrollbarVisible={this.props.yScrollbarVisible}
-            onScroll={this.onScroll}
             handleMouseDownColumnResizer={this.handleMouseDownColumnResizer}
             handleMouseDownColumnHeader={this.handleMouseDownColumnHeader}
             columnRefs={this.getColumnRefs}
@@ -612,7 +612,6 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
             columnDefs={this.props.scrollableColumnDefs}
             xScrollbarVisible={this.props.xScrollbarVisible}
             yScrollbarVisible={this.props.yScrollbarVisible}
-            onScroll={this.onScroll}
             handleMouseDownColumnResizer={this.handleMouseDownColumnResizer}
             handleMouseDownColumnHeader={this.handleMouseDownColumnHeader}
             columnRefs={this.getColumnRefs}
@@ -841,16 +840,6 @@ export class GridViewImpl<P extends Partial<GridViewProps>, S> extends React.Com
   private getNeighborColumnIndex = (columnOrder: number[], columnIndex: number): number => {
     const resizeColumnPosition = columnOrder.indexOf(columnIndex);
     return columnOrder[resizeColumnPosition + 1];
-  }
-
-  private onScroll = (yScrollPosition: number) => {
-    const nextYScrollPosition = this.gridContainerRef.scrollTop;
-    if (nextYScrollPosition !== yScrollPosition) {
-      window.requestAnimationFrame(() => this.props.dispatch(Action.setYScrollPosition(nextYScrollPosition)));
-    } else {
-      const nextXScrollPosition = this.gridContainerRef.scrollLeft;
-      window.requestAnimationFrame(() => this.props.dispatch(Action.setXScrollPosition(nextXScrollPosition)));
-    }
   }
 
   /*
