@@ -37,6 +37,7 @@
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime": "^7.0.0-rc.1",
     "@csegames/camelot-unchained": "^0.1.64",
+    "@types/uuid": "^3.4.3",
     "aphrodite": "^1.1.0",
     "apollo": "^1.7.0",
     "apollo-client": "^1.9.0-1",
@@ -74,8 +75,10 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "redux-typed-modules": "^2.2.1",
+    "reselect": "^3.0.1",
     "sass-importer-node": "^1.0.1",
     "why-did-you-update": "^0.1.1",
+    "uuid": "^3.3.2",
     "yargs-parser": "^2.4.1"
   },
   "devDependencies": {
