@@ -16,9 +16,6 @@ import ListHeader from './ListHeader';
 import ListItem from './ListItem';
 import TeamScore from './TeamScore';
 import { TeamInterface, TeamPlayer } from './ScenarioResultsContainer';
-import {
-  JobSummaryDBModel, CountPerTargetTypeDBModel,
-} from '../../../../node_modules/@csegames/camelot-unchained/lib/graphql';
 
 const Container = styled('div')`
   position: relative;
@@ -80,6 +77,7 @@ export interface ListState {
 
 class List extends React.Component<ListProps, ListState> {
   private listRef: HTMLDivElement;
+
   constructor(props: ListProps) {
     super(props);
     this.state = {
@@ -90,12 +88,12 @@ class List extends React.Component<ListProps, ListState> {
   }
 
   public render() {
-    const { /*players, teams,*/ status, visible } = this.props;
-    if (true) {
+    const { /* players,*/teams, status, visible } = this.props;
+    if (true && teams.length) {
       const displayedPlayers = this.getDisplayedPlayers();
       return (
         <Container>
-          <TeamScore teams={this.createTeams()} scenarioID={this.props.scenarioID} />
+          <TeamScore teams={teams} scenarioID={this.props.scenarioID} />
           <ListHeader onSearchChange={this.onSearchChange} onSortClick={this.onSortClick} {...this.state} />
           <SearchableList
             visible={visible}
@@ -162,7 +160,7 @@ class List extends React.Component<ListProps, ListState> {
   }
 
   private getDisplayedPlayers = () => {
-    const players = this.createData();
+    const players = this.props.players;
     const sortedPlayers = this.state.selectedSortBy !== SortBy.None ?
       players.sort((a: TeamPlayer, b: TeamPlayer) => this.sortPlayersByStat(a, b, this.state)) : players;
     return sortedPlayers;
@@ -221,86 +219,6 @@ class List extends React.Component<ListProps, ListState> {
 
   private onSearchChange = (value: string) => {
     this.setState({ searchValue: value, selectedSortBy: SortBy.None, leastToGreatest: false });
-  }
-
-  private createData = (): TeamPlayer[] => {
-    const teamPlayers: TeamPlayer[] = [];
-    for (let i = 0; i < 1000; i++) {
-      const teamPlayer: TeamPlayer = {
-        teamID: this.createTeamID(i),
-        displayName: 'Player ' + i,
-        characterType: 'PlayerCharacter',
-        damage: {
-          healingApplied: this.createCPTModel(i),
-          healingReceived: this.createCPTModel(i),
-          damageApplied: this.createCPTModel(i),
-          damageReceived: this.createCPTModel(i),
-          killCount: this.createCPTModel(i),
-          deathCount: this.createCPTModel(i),
-          killAssistCount: this.createCPTModel(i),
-          createCount: this.createCPTModel(i),
-        },
-        score: i * 10,
-        crafting: {
-          blockSummary: this.createJobSummaryModel(i),
-          grindSummary: this.createJobSummaryModel(i),
-          makeSummary: this.createJobSummaryModel(i),
-          purifySummary: this.createJobSummaryModel(i),
-          repairSummary: this.createJobSummaryModel(i),
-          salvageSummary: this.createJobSummaryModel(i),
-          shapeSummary: this.createJobSummaryModel(i),
-        },
-      };
-      teamPlayers.push(teamPlayer);
-    }
-    return teamPlayers;
-  }
-
-  private createTeamID = (i: number): string => {
-    const chooseTeam = i % 3;
-    switch (chooseTeam) {
-      case 1: return 'Arthurian';
-      case 2: return 'Viking';
-      default: return 'Tuatha';
-    }
-  }
-
-  private createCPTModel = (i: number): CountPerTargetTypeDBModel => {
-    return ({
-      self: i + i % 5,
-      playerCharacter: i + i % 2 * 2,
-      nonPlayerCharacter: i + i % 3 * 3,
-      dummy: i + i % 5 * 5,
-      anyCharacter: i + i % 7 * 7,
-      resourceNode: i + i % 11 * 11,
-      item: i + i % 13 * 13,
-      building: i + i % 17 * 17,
-    });
-  }
-
-  private createJobSummaryModel = (i: number): JobSummaryDBModel => {
-    return ({
-      started: i,
-      canceled: i,
-      collected: i,
-    });
-  }
-
-  private createTeams = (): TeamInterface[] => {
-    return [
-      {
-        teamID: 'Arthurian',
-        outcome: 'Lose',
-      },
-      {
-        teamID: 'Viking',
-        outcome: 'Lose',
-      },
-      {
-        teamID: 'Tuatha',
-        outcome: 'Win',
-      },
-    ];
   }
 }
 
