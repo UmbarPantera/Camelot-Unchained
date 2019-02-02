@@ -141,7 +141,7 @@ function loadingRun() {
     return;
   }
 
-  _devGame.loadingState.percent += 1;
+  _devGame.loadingState.percent += 20;
   _devGame.loadingState.message = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
   console.log('MOCK.loadingState', `run - ${game.loadingState.percent}% ${game.loadingState.message}`);
   engine.trigger(LoadingState_Update, game.loadingState);

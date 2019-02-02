@@ -93,13 +93,32 @@ export interface Props {
   progress: number;
 }
 
-// tslint:disable-next-line:function-name
-export function ProgressBar(props: Props) {
-  return (
-    <BarContainer>
-      <ProgressText>{props.progress}%</ProgressText>
-      <Bar style={{ left: `${-(100 - props.progress)}%` }} />
-      {props.progress === 100 && <ButtonShine />}
-    </BarContainer>
-  );
+export interface State {
+  shine: boolean;
+}
+
+export class ProgressBar extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { shine: false };
+  }
+
+  public render() {
+    const props = this.props;
+    if (props.progress === 100 && !this.state.shine) {
+      window.addEventListener('transitionend', this.transitionEnd);
+    }
+    return (
+      <BarContainer>
+        <ProgressText>{props.progress}%</ProgressText>
+        <Bar style={{ left: `${-(100 - props.progress)}%` }} />
+        {this.state.shine && <ButtonShine />}
+      </BarContainer>
+    );
+  }
+
+  private transitionEnd = () => {
+    this.setState({ shine: true });
+    window.removeEventListener('transitionend', this.transitionEnd);
+  }
 }
