@@ -320,6 +320,7 @@ export interface State {
 
 export class IconPicker extends React.PureComponent<Props, State> {
   private mouseOver: boolean;
+  private loading = false;
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -341,7 +342,8 @@ export class IconPicker extends React.PureComponent<Props, State> {
         >
           <Wrapper>
             {this.state.selectedArchetypes.map((archetype) => {
-              if (!!this.state.iconsByClass[archetype]) return;
+              if (!!this.state.iconsByClass[archetype] || this.loading) return;
+              this.loading = true;
               if (archetype === 'All') {
                 this.initializeIcons();
                 return;
@@ -440,6 +442,7 @@ export class IconPicker extends React.PureComponent<Props, State> {
   private handleQueryResult = (archetype: string) => {
     return (graphql: GraphQLResult<IconQuery.Query>) => {
       if (graphql.loading || !graphql.data) return graphql;
+      this.loading = false;
       this.setState((prevState: State) => ({
         iconsByClass: {
           ...prevState.iconsByClass,
@@ -459,6 +462,7 @@ export class IconPicker extends React.PureComponent<Props, State> {
     elements.slice(5, elements.length).forEach((element: any) => {
       icons.push('http://camelot-unchained.s3.amazonaws.com/' + element.elements[0].elements[0].text);
     });
+    this.loading = false;
     this.setState((prevState: State) => ({
       iconsByClass: {
         ...prevState.iconsByClass,
