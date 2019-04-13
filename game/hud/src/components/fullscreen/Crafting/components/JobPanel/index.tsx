@@ -15,7 +15,8 @@ import { InventoryContext } from 'fullscreen/ItemShared/InventoryContext';
 import { SlotNumberToItem } from 'fullscreen/ItemShared/InventoryBase';
 import { ContextState, defaultJobContextState } from './JobPanelContext';
 import { CraftingContext } from '../../CraftingContext';
-import JobPanelPageView from './JobPanelPageView';
+// import JobPanelPageView from './JobPanelPageView';
+import NumberWheel from '../NumberWheel';
 import JobPanelTab from './JobPanelTab';
 import RecipeBook from '../RecipeBook';
 import {
@@ -297,7 +298,15 @@ class JobPanelPage extends React.Component<Props, State> {
               })}
             </TabsContainer>
             <JobContainer>
-              <JobPanelPageView {...this.state} jobNumber={jobNumber} voxEntityID={voxEntityID} />
+            <NumberWheel
+          defaultValue={100}
+          maxValue={100}
+          minValue={0}
+          maxCutoffValue={100}
+          onSelectValue={(quality: number) => console.log(quality)}
+          trailValueDecorator='%'
+          prevValueDecorator='x'
+        />
             </JobContainer>
           </JobPanelContainer>
           <RecipeBookContainer>
