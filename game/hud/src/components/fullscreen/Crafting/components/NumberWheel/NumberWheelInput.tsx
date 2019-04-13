@@ -83,7 +83,11 @@ class NumberWheelInput extends React.Component<Props, State> {
   }
 
   private onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVal = Number(e.target.value);
+    const start = this.props.prevValueDecorator ? this.props.prevValueDecorator.length : 0;
+    const end = this.props.trailValueDecorator
+      ? - this.props.trailValueDecorator.length
+      : e.target.value.length;
+    const newVal = Number(e.target.value.slice(start, end));
     this.setState({ tempValue: newVal });
     this.onChange(newVal);
   }
