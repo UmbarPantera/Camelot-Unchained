@@ -83,15 +83,14 @@ class NumberWheelInput extends React.Component<Props, State> {
   }
 
   private onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let inputValue = e.target.value;
+    // get start and end of the number to remove the decorators
+    const start = this.props.prevValueDecorator ? this.props.prevValueDecorator.length : 0;
+    const end = this.props.trailValueDecorator
+      ? - this.props.trailValueDecorator.length
+      : e.target.value.length;
 
-    if (this.props.prevValueDecorator) {
-      // Remove prevalue decorator before turning value into number
-      inputValue = inputValue.replace(this.props.prevValueDecorator, '');
-    }
-
-    const newVal = Number(inputValue);
-    if (typeof newVal === 'number') {
+    const newVal = Number(e.target.value.slice(start, end));
+    if (!isNaN(newVal)) {
       this.setState({ tempValue: newVal });
       this.onChange(newVal);
     }
