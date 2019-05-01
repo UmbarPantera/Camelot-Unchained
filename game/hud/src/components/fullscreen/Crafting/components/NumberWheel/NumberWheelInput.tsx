@@ -55,6 +55,8 @@ export interface State {
 }
 
 class NumberWheelInput extends React.Component<Props, State> {
+  private inputRef: HTMLInputElement = null;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -71,6 +73,8 @@ class NumberWheelInput extends React.Component<Props, State> {
         inputClassName={InputStyle}
         value={`${this.props.prevValueDecorator || ''}${this.state.tempValue}${this.props.trailValueDecorator || ''}`}
         onChange={this.onInputChange}
+        onFocus={() => this.placeCursor() }
+        getRef={r => this.inputRef = r}
       />
     );
   }
@@ -79,6 +83,19 @@ class NumberWheelInput extends React.Component<Props, State> {
     // Debounced prop value has updated, check to make sure local state and prop are in sync.
     if (prevProps.value !== this.props.value && this.props.value !== this.state.tempValue) {
       this.setState({ tempValue: this.props.value });
+    }
+    this.placeCursor();
+  }
+
+  private placeCursor = () => {
+    const valueLength = this.inputRef.value.length;
+    const cursorPos = this.inputRef.selectionStart;
+    if (this.props.trailValueDecorator && (cursorPos > valueLength - this.props.trailValueDecorator.length)) {
+      const newPos = valueLength - this.props.trailValueDecorator.length;
+      this.inputRef.setSelectionRange(newPos, newPos);
+    } else if (this.props.prevValueDecorator && (cursorPos < this.props.prevValueDecorator.length)) {
+      const newPos = this.props.prevValueDecorator.length;
+      this.inputRef.setSelectionRange(newPos, newPos);
     }
   }
 
@@ -93,6 +110,8 @@ class NumberWheelInput extends React.Component<Props, State> {
     if (!isNaN(newVal)) {
       this.setState({ tempValue: newVal });
       this.onChange(newVal);
+    } else {
+      this.setState({ tempValue: this.props.value });
     }
   }
 
