@@ -113,7 +113,12 @@ class NumberWheelInput extends React.Component<Props, State> {
       this.onChange(newVal);
     } else {
       const { left, top } = e.target.getBoundingClientRect();
-      game.trigger('show-action-alert', validationMessage, { clientX: left - validationMessage.length, clientY: top - 8 });
+      game.trigger(
+        'show-action-alert',
+        validationMessage,
+        { clientX: left - validationMessage.length, clientY: top - 8 },
+        { color: 'red' },
+      );
       this.setState({ tempValue: this.props.value });
     }
   }
