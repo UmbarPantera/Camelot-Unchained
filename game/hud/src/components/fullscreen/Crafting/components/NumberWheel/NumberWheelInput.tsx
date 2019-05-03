@@ -107,20 +107,32 @@ class NumberWheelInput extends React.Component<Props, State> {
       : e.target.value.length;
 
     const newVal = Number(e.target.value.slice(start, end));
-    if (!isNaN(newVal)) {
+    const validationMessage = this.validateInput(newVal);
+    if (validationMessage === 'ok') {
       this.setState({ tempValue: newVal });
       this.onChange(newVal);
     } else {
+      const { left, top } = e.target.getBoundingClientRect();
+      game.trigger('show-action-alert', validationMessage, { clientX: left - validationMessage.length, clientY: top - 8 });
       this.setState({ tempValue: this.props.value });
     }
   }
 
-  private onChange = (newVal: number) => {
-    if (newVal <= this.props.maxValue && newVal >= this.props.minValue) {
-      this.props.onChange(newVal);
-    } else {
-      this.setState({ tempValue: this.props.value });
+  private validateInput = (value: number): string => {
+    if (value > this.props.maxValue) {
+      return (`Maximum: ${this.props.maxValue}`);
     }
+    if (value < this.props.minValue) {
+      return (`Minimum: ${this.props.minValue}`);
+    }
+    if (isNaN(value)) {
+      return ('No number');
+    }
+    return 'ok';
+  }
+
+  private onChange = (newVal: number) => {
+    this.props.onChange(newVal);
   }
 }
 
