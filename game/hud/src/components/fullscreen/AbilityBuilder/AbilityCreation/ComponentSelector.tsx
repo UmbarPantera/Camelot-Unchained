@@ -679,7 +679,6 @@ export class ComponentSelector extends React.PureComponent<Props, State> {
                   listContainerStyles={ListContainerStyles}
                 />
               </ComponentBG>
-              {this.renderDescription()}
             </Container>
           );
         }}

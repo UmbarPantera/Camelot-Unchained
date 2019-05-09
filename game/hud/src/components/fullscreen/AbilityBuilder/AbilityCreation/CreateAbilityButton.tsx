@@ -12,6 +12,7 @@ import { HD_SCALE, MID_SCALE } from 'fullscreen/lib/constants';
 const Container = styled.div`
   width: 100%;
   display: flex;
+  flex: 0 0 auto;
   justify-content: center;
 `;
 

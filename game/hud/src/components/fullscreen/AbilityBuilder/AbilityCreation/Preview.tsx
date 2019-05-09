@@ -23,6 +23,7 @@ const CONTAINER_PADDING_BOT = 200;
 // #endregion
 const Container = styled.div`
   position: relative;
+  flex: 0 0 auto;
   width: 100%;
   height: fit-content;
   display: flex;
@@ -344,7 +345,7 @@ const ComponentImageWrapper = styled.div`
   position: relative;
   width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
   height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
-  margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
+  margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
   pointer-events: all;
   &:after {
     content: '';
@@ -376,13 +377,13 @@ const ComponentImageWrapper = styled.div`
   @media (max-width: 2560px) {
     width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * MID_SCALE}px;
     height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * MID_SCALE}px;
-    margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
   }
 
   @media (max-width: 1920px) {
     width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * HD_SCALE}px;
     height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * HD_SCALE}px;
-    margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
   }
 `;
 

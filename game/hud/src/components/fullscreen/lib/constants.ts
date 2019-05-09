@@ -7,8 +7,8 @@
 import { ArmorType } from './itemInterfaces';
 
 // Scales are relative to UHD
-export const HD_SCALE = 0.5;
-export const MID_SCALE = 0.6;
+export const HD_SCALE = 0.4;
+export const MID_SCALE = 0.5;
 
 export const SLOT_DIMENSIONS = {
   WIDTH: 80,

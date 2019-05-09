@@ -18,9 +18,16 @@ import { AbilityBuilderContext, ComponentIDToComponent, AbilityType } from '..';
 const Container = styled.div`
   width: 100%;
   height: 100%;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   padding: 0 10px;
   margin-right: 5px;
+`;
+
+const ScrollContainer = styled.div`
+flex: 1 1 auto;
+overflow: auto;
 `;
 
 const ListContainer = styled.div`
@@ -77,21 +84,23 @@ class AbilityNetworkTemplateView extends React.PureComponent<Props, State> {
     // Filter out empty categories
     const componentCategories = this.props.componentCategories.filter(category => category.components.length > 0);
     return (
-      <Container className='cse-ui-scroller-thumbonly'>
-        <ListContainer>
-          {componentCategories.map(category => (
-            <ComponentSelector
-              selectedType={this.props.selectedType}
-              optional={!category.def.isRequired}
-              categoryID={category.def.id}
-              title={`Select ${category.def.displayInfo.name}`}
-              listItems={category.components.map(item => ({ id: item.id, data: item }))}
-              selectedItem={this.state.selectedComponentMap[category.def.id]}
-              onSelectedItemChange={this.onSelectedItemChange}
-              selectedComponentsList={selectedComponentsList}
-            />
-          ))}
-        </ListContainer>
+      <Container>
+        <ScrollContainer className='cse-ui-scroller-thumbonly'>
+          <ListContainer>
+            {componentCategories.map(category => (
+              <ComponentSelector
+                selectedType={this.props.selectedType}
+                optional={!category.def.isRequired}
+                categoryID={category.def.id}
+                title={`Select ${category.def.displayInfo.name}`}
+                listItems={category.components.map(item => ({ id: item.id, data: item }))}
+                selectedItem={this.state.selectedComponentMap[category.def.id]}
+                onSelectedItemChange={this.onSelectedItemChange}
+                selectedComponentsList={selectedComponentsList}
+              />
+            ))}
+          </ListContainer>
+        </ScrollContainer>
         <Preview
           components={selectedComponentsList}
           selectedType={this.props.selectedType}
