@@ -15,6 +15,7 @@ const CONTAINER_HEIGHT = 130;
 const Container = styled.div`
   position: relative;
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   padding: 0px 20px;
   height: ${CONTAINER_HEIGHT}px;
