@@ -60,6 +60,7 @@ export interface Props {
 
 export interface State {
   listItems: ListItem<any>[];
+  centerContent: boolean;
 }
 
 const MOUSE_DOWN_TIMEOUT = 200;
@@ -77,28 +78,28 @@ class ListSelector extends React.PureComponent<Props, State> {
     super(props);
     this.state = {
       listItems: props.listItems,
+      centerContent: true,
     };
   }
 
   public render() {
-    const centerContent = this.shouldCenterContent();
     return (
       <Container>
         <ButtonWrapper
-          className={centerContent ? 'disabled' : ''}
+          className={this.state.centerContent ? 'disabled' : ''}
           onMouseDown={this.onPrevMouseDown}
           onMouseUp={this.onPrevMouseUp}>
           {this.props.renderPrevButton()}
         </ButtonWrapper>
         <ListContainer
           ref={r => this.listRef = r}
-          className={`${this.props.listContainerStyles} ${centerContent ? 'center' : ''}`}>
+          className={`${this.props.listContainerStyles} ${this.state.centerContent ? 'center' : ''}`}>
           {this.state.listItems.map((item, i) => {
             return <div key={i}>{this.props.renderListItem(item)}</div>;
           })}
         </ListContainer>
         <ButtonWrapper
-          className={centerContent ? 'disabled' : ''}
+          className={this.state.centerContent ? 'disabled' : ''}
           onMouseDown={this.onNextMouseDown}
           onMouseUp={this.onNextMouseUp}>
           {this.props.renderNextButton()}
@@ -107,12 +108,14 @@ class ListSelector extends React.PureComponent<Props, State> {
     );
   }
 
-  public componentDidMount() {
-    window.setTimeout(this.initializeList, 10);
-  }
-
-  private initializeList = () => {
-    this.updateInfiniteList();
+  public componentDidUpdate(prevProps: Props) {
+    if (prevProps.listItems !== this.props.listItems) {
+      this.setState({ listItems: this.props.listItems });
+    }
+    const shouldCenterContent = this.shouldCenterContent();
+    if (shouldCenterContent !== this.state.centerContent) {
+      this.setState({ centerContent: shouldCenterContent });
+    }
   }
 
   private shouldCenterContent = () => {

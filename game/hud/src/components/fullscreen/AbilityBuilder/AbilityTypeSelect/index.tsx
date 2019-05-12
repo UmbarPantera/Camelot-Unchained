@@ -62,6 +62,7 @@ export class AbilityTypeSelect extends React.PureComponent<Props> {
               {buildableNetworks.map((network) => {
                 return (
                   <AbilityTypeSelectItem
+                    key={network.id}
                     type={{ id: network.id, name: network.display.name }}
                     width={100 / buildableNetworks.length}
                     onSelectType={this.props.onSelectType}

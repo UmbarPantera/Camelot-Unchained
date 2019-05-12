@@ -7,17 +7,19 @@
 import * as React from 'react';
 import { css } from '@csegames/linaria';
 import { styled } from '@csegames/linaria/react';
+import { isArray } from 'lodash';
 import { Tooltip } from 'shared/Tooltip';
 
-import { AbilityType } from '..';
+import { AbilityType, ComponentIDToComponent } from '..';
 import { TooltipContent } from './TooltipContent';
 import { TextEdit } from './TextEdit';
 import { IconPicker } from './IconPicker';
-import { AbilityBuilderQuery } from 'gql/interfaces';
 import { MID_SCALE, HD_SCALE } from 'fullscreen/lib/constants';
+import { ComponentCategorySelector, SelectedComponentMap } from './AbilityNetworkTemplate';
+import { AbilityBuilderQuery } from 'gql/interfaces';
 
 // #region Container constants
-const CONTAINER_MARGIN = -100;
+const CONTAINER_MARGIN = -80;
 const CONTAINER_PADDING_TOP = 100;
 const CONTAINER_PADDING_BOT = 200;
 // #endregion
@@ -26,8 +28,10 @@ const Container = styled.div`
   width: 100%;
   height: fit-content;
   display: flex;
+  flex: 0 0 auto;
   height: fit-content;
-  margin: ${CONTAINER_MARGIN}px 0;
+  margin-top: ${CONTAINER_MARGIN}px;
+  margin-bottom: ${CONTAINER_MARGIN * 1.2}px;
   padding: ${CONTAINER_PADDING_TOP}px 0 ${CONTAINER_PADDING_BOT}px 0;
   pointer-events: none;
   z-index: 1;
@@ -61,12 +65,14 @@ const Container = styled.div`
   }
 
   @media (max-width: 2560px) {
-    margin: ${CONTAINER_MARGIN * MID_SCALE}px 0;
+    margin-top: ${CONTAINER_MARGIN * MID_SCALE}px;
+    margin-bottom: ${CONTAINER_MARGIN * MID_SCALE * 1.2}px;
     padding: ${CONTAINER_PADDING_TOP * MID_SCALE}px 0 ${CONTAINER_PADDING_BOT * MID_SCALE}px 0;
   }
 
   @media (max-width: 1920px) {
-    margin: ${CONTAINER_MARGIN * HD_SCALE}px 0;
+    margin-top: ${CONTAINER_MARGIN * HD_SCALE}px;
+    margin-bottom: ${CONTAINER_MARGIN * HD_SCALE * 1.2}px;
     padding: ${CONTAINER_PADDING_TOP * HD_SCALE}px 0 ${CONTAINER_PADDING_BOT * HD_SCALE}px 0;
 
     &:before {
@@ -334,6 +340,7 @@ const Description = styled.div`
 
 const ComponentContainer = styled.div`
   display: flex;
+  justify-content: space-around;
 `;
 
 // #region ComponentImageWrapper constants
@@ -344,7 +351,7 @@ const ComponentImageWrapper = styled.div`
   position: relative;
   width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
   height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
-  margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
+  align-items: center;
   pointer-events: all;
   &:after {
     content: '';
@@ -376,19 +383,71 @@ const ComponentImageWrapper = styled.div`
   @media (max-width: 2560px) {
     width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * MID_SCALE}px;
     height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * MID_SCALE}px;
-    margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
   }
 
   @media (max-width: 1920px) {
     width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * HD_SCALE}px;
     height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * HD_SCALE}px;
-    margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
   }
 `;
 
 const ComponentImage = styled.img`
   width: 100%;
   height: 100%;
+`;
+
+const CategoryContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
+  align-items: center;
+
+  @media (max-width: 2560px) {
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
+  }
+
+  @media (max-width: 1920px) {
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
+  }
+`;
+
+// #region CategoryTitle constants
+const CATEGORY_TITLE_HEIGHT = 50;
+const CATEGORY_TITLE_FONT_SIZE = 26;
+const CATEGORY_TITLE_LETTER_SPACING = 2;
+// #endregion
+const CategoryTitle = styled.div`
+  text-transform: uppercase;
+  text-align: center;
+  font-family: TradeWinds;
+  color: #cebd9d;
+  width: 70%;
+  letter-spacing: ${CATEGORY_TITLE_LETTER_SPACING}px;
+  font-size: ${CATEGORY_TITLE_FONT_SIZE}px;
+  height: ${CATEGORY_TITLE_HEIGHT}px;
+  background-image: url(../images/abilitybuilder/uhd/component-title.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+  display: flex;
+  justify-content: center;
+  cursor: none;
+  z-index: 1;
+
+  @media (max-width: 2560px) {
+    letter-spacing: ${CATEGORY_TITLE_LETTER_SPACING * MID_SCALE}px;
+    font-size: ${CATEGORY_TITLE_FONT_SIZE * MID_SCALE}px;
+    height: ${CATEGORY_TITLE_HEIGHT * MID_SCALE}px;
+  }
+
+  @media (max-width: 1920px) {
+    background-image: url(../images/abilitybuilder/hd/component-title.png);
+    letter-spacing: ${CATEGORY_TITLE_LETTER_SPACING * HD_SCALE}px;
+    font-size: ${CATEGORY_TITLE_FONT_SIZE * HD_SCALE}px;
+    height: ${CATEGORY_TITLE_HEIGHT * HD_SCALE}px;
+  }
 `;
 
 // const StatsContainer = styled.div`
@@ -444,7 +503,12 @@ export interface ComponentProps {
   onSelectedIconChange: (icon: string) => void;
   onNameChange: (name: string) => void;
   onDescriptionChange: (description: string) => void;
-  components: AbilityBuilderQuery.AbilityComponents[];
+  selectedComponents: AbilityBuilderQuery.AbilityComponents[];
+  selectedComponentMap: SelectedComponentMap;
+  componentCategories: ComponentCategorySelector[];
+  selectedCategory: number;
+  componentIDToComponent: ComponentIDToComponent;
+  onCategoryClick: (category: number) => void;
 }
 
 export type Props = InjectedProps & ComponentProps;
@@ -468,8 +532,53 @@ class Preview extends React.PureComponent<Props, State> {
   }
 
   public render() {
-    const { components, selectedType } = this.props;
+    const { componentCategories, selectedType, selectedComponentMap, selectedComponents, onCategoryClick } = this.props;
     // const stats = this.getStats();
+
+    const content = componentCategories.map((category, index) => {
+      if ((Object.keys(selectedComponentMap).indexOf(category.def.id) !== -1) && (selectedComponentMap[category.def.id])) {
+        const components = this.getComponents(selectedComponentMap[category.def.id]);
+        return (
+          <CategoryContainer
+            key={index}
+            onClick={() => onCategoryClick(index)}
+          >
+            <CategoryTitle>{category.def.displayInfo.name}</CategoryTitle>
+            {components.map((component) => {
+              return (
+                <Tooltip
+                  key={component.id}
+                  content={
+                    <TooltipContent
+                      componentItem={component}
+                      selectedComponentsList={this.props.selectedComponents}
+                    />
+                  }>
+                  <ComponentImageWrapper className={selectedType.name}>
+                    <ComponentImage src={component.display.iconURL} />
+                  </ComponentImageWrapper>
+                </Tooltip>
+              );
+            })
+            }
+          </CategoryContainer>
+        );
+      }
+
+      return (
+        <CategoryContainer
+          key={index}
+          onClick={() => onCategoryClick(index)}
+        >
+          <CategoryTitle>{category.def.displayInfo.name}</CategoryTitle>
+          <Tooltip
+            content={'Click to select'}>
+            <ComponentImageWrapper className={selectedType.name}>
+            </ComponentImageWrapper>
+          </Tooltip>
+        </CategoryContainer>
+      );
+    });
 
     return (
       <>
@@ -498,24 +607,10 @@ class Preview extends React.PureComponent<Props, State> {
               selectedType={this.props.selectedType}
             />
             <Description className={selectedType.name}>
-              {components.map(component => component.display.description + '. ')}
+              {selectedComponents.map(component => component.display.description + '. ')}
             </Description>
             <ComponentContainer>
-              {components.map((component) => {
-                return (
-                  <Tooltip
-                    content={
-                      <TooltipContent
-                        componentItem={component}
-                        selectedComponentsList={this.props.components}
-                      />
-                    }>
-                    <ComponentImageWrapper className={selectedType.name}>
-                      <ComponentImage src={component.display.iconURL} />
-                    </ComponentImageWrapper>
-                  </Tooltip>
-                );
-              })}
+              {content}
             </ComponentContainer>
           </InfoContainer>
         </ContentContainer>
@@ -552,6 +647,16 @@ class Preview extends React.PureComponent<Props, State> {
   public componentWillUnmount() {
     window.removeEventListener('optimizedResize', this.listenForHeightChanges);
     this.containerRef.parentElement.removeEventListener('scroll', this.updateIconPickerPosition);
+  }
+
+  private getComponents = (id: string | string[]): AbilityBuilderQuery.AbilityComponents[] => {
+    let componentItems: AbilityBuilderQuery.AbilityComponents[] = [];
+    if (isArray(id)) {
+      componentItems = componentItems.concat(id.map(id => this.props.componentIDToComponent[id]));
+    } else if (id) {
+      componentItems.push(this.props.componentIDToComponent[id]);
+    }
+    return componentItems;
   }
 
   private listenForHeightChanges = () => {

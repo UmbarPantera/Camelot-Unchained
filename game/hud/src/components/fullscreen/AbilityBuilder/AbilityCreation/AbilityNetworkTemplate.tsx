@@ -21,9 +21,12 @@ const Container = styled.div`
   overflow: auto;
   padding: 0 10px;
   margin-right: 5px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ListContainer = styled.div`
+  flex: 1 1 auto;
   width: 100%;
   height: fit-content;
 `;
@@ -56,6 +59,7 @@ export interface State {
   description: string;
   selectedIcon: string | null;
   selectedComponentMap: SelectedComponentMap;
+  selectedCategory: number;
 }
 
 class AbilityNetworkTemplateView extends React.PureComponent<Props, State> {
@@ -68,32 +72,20 @@ class AbilityNetworkTemplateView extends React.PureComponent<Props, State> {
       description: '',
       selectedIcon: this.props.componentCategories[0].components[0].display.iconURL,
       selectedComponentMap,
+      selectedCategory: 0,
     };
   }
 
   public render() {
+    const props = this.props;
     const selectedComponentsList = this.getSelectedComponents();
 
-    // Filter out empty categories
-    const componentCategories = this.props.componentCategories.filter(category => category.components.length > 0);
+    const category = props.componentCategories[this.state.selectedCategory];
     return (
       <Container className='cse-ui-scroller-thumbonly'>
-        <ListContainer>
-          {componentCategories.map(category => (
-            <ComponentSelector
-              selectedType={this.props.selectedType}
-              optional={!category.def.isRequired}
-              categoryID={category.def.id}
-              title={`Select ${category.def.displayInfo.name}`}
-              listItems={category.components.map(item => ({ id: item.id, data: item }))}
-              selectedItem={this.state.selectedComponentMap[category.def.id]}
-              onSelectedItemChange={this.onSelectedItemChange}
-              selectedComponentsList={selectedComponentsList}
-            />
-          ))}
-        </ListContainer>
         <Preview
-          components={selectedComponentsList}
+          selectedComponentMap={this.state.selectedComponentMap}
+          selectedComponents={selectedComponentsList}
           selectedType={this.props.selectedType}
           selectedIcon={this.state.selectedIcon}
           onSelectedIconChange={this.onSelectedIconChange}
@@ -101,7 +93,23 @@ class AbilityNetworkTemplateView extends React.PureComponent<Props, State> {
           onNameChange={this.onNameChange}
           description={this.state.description}
           onDescriptionChange={this.onDescriptionChange}
+          componentCategories={props.componentCategories}
+          selectedCategory={this.state.selectedCategory}
+          componentIDToComponent={props.componentIDToComponent}
+          onCategoryClick={this.onCategoryClick}
         />
+        <ListContainer>
+          <ComponentSelector
+            selectedType={this.props.selectedType}
+            optional={!category.def.isRequired}
+            categoryID={category.def.id}
+            title={`Select ${category.def.displayInfo.name}`}
+            listItems={category.components.map(item => ({ id: item.id, data: item }))}
+            selectedItem={this.state.selectedComponentMap[category.def.id]}
+            onSelectedItemChange={this.onSelectedItemChange}
+            selectedComponentsList={selectedComponentsList}
+          />
+        </ListContainer>
         <CreateAbilityButton selectedType={this.props.selectedType} onClick={this.onCreateClick} />
       </Container>
     );
@@ -231,6 +239,10 @@ class AbilityNetworkTemplateView extends React.PureComponent<Props, State> {
       this.state.name,
       this.state.description,
     );
+  }
+
+  private onCategoryClick = (category: number) => {
+    this.setState({ selectedCategory: category });
   }
 }
 

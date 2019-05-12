@@ -14,6 +14,7 @@ import { webAPI } from '@csegames/camelot-unchained';
 
 const Container = styled.div`
   position: relative;
+  flex: 1 1 auto;
   width: calc(100% - 25px);
   height: calc(100% - 70px);
 `;
@@ -99,7 +100,7 @@ class AbilityCreationView extends React.PureComponent<Props, State> {
       });
     });
 
-    return componentCategorySelectors;
+    return componentCategorySelectors.filter(category => category.components.length > 0);
   }
 
   private onCreateAbility = async (type: AbilityType,

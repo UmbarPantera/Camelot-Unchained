@@ -122,20 +122,6 @@ const TITLE_HEIGHT = 86;
 const TITLE_FONT_SIZE = 36;
 const TITLE_LETTER_SPACING = 4;
 // #endregion
-const ClosedContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: ${TITLE_HEIGHT}px;
-  pointer-events: none;
-
-  @media (max-width: 2560px) {
-    height: ${TITLE_HEIGHT * MID_SCALE}px;
-  }
-
-  @media (max-width: 1920px) {
-    height: ${TITLE_HEIGHT * HD_SCALE}px;
-  }
-`;
 
 const TitleContainer = styled.div`
   position: absolute;
@@ -584,11 +570,6 @@ export interface ComponentItem {
   stats: { name: string, value: number }[];
 }
 
-export interface State {
-  // Only applies to optional ability component types.
-  closed: boolean;
-}
-
 export interface Props {
   title: string;
   listItems: ListItem<AbilityBuilderQuery.AbilityComponents>[];
@@ -601,32 +582,13 @@ export interface Props {
   optional?: boolean;
 }
 
-export class ComponentSelector extends React.PureComponent<Props, State> {
+export class ComponentSelector extends React.PureComponent<Props, {}> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      closed: props.optional,
-    };
   }
 
   public render() {
     const { selectedType, optional, title, listItems, selectedComponentsList } = this.props;
-    if (this.state.closed) {
-      return (
-        <ClosedContainer>
-          <TitleContainer>
-            <div />
-            <Title>{title} (Optional)</Title>
-            {this.props.listItems.length === 0 ?
-              <Tooltip content='There are no components for this category at the moment.'>
-                <OptionalButton className='add disabled'>Add</OptionalButton>
-              </Tooltip> :
-              <OptionalButton className='add' onClick={this.onOptionalOpen}>Add</OptionalButton>
-            }
-          </TitleContainer>
-        </ClosedContainer>
-      );
-    }
 
     return (
       <UIContext.Consumer>
@@ -732,11 +694,6 @@ export class ComponentSelector extends React.PureComponent<Props, State> {
     }
 
     return this.props.selectedItem === item.id;
-  }
-
-  private onOptionalOpen = () => {
-    this.setState({ closed: false });
-    this.props.onSelectedItemChange(this.props.categoryID, this.props.listItems[0].id);
   }
 
   private onOptionalClose = () => {
