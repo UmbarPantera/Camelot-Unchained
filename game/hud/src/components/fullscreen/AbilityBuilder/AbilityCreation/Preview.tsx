@@ -28,6 +28,7 @@ const Container = styled.div`
   width: 100%;
   height: fit-content;
   display: flex;
+  flex-direciton: column;
   flex: 0 0 auto;
   height: fit-content;
   margin-top: ${CONTAINER_MARGIN}px;
@@ -120,6 +121,7 @@ const CONTENT_CONTAINER_MARGIN_LEFT = 120;
 const ContentContainer = styled.div`
   flex: 2;
   display: flex;
+  flex-direction: column;
   margin: ${CONTENT_CONTAINER_MARGIN_TOP}px ${CONTENT_CONTAINER_MARGIN_RIGHT}px 0 ${CONTENT_CONTAINER_MARGIN_LEFT}px;
   height: 60%;
 
@@ -132,6 +134,10 @@ const ContentContainer = styled.div`
     margin: ${CONTENT_CONTAINER_MARGIN_TOP * HD_SCALE}px ${CONTENT_CONTAINER_MARGIN_RIGHT * HD_SCALE}px
      0 ${CONTENT_CONTAINER_MARGIN_LEFT * HD_SCALE}px;
   }
+`;
+
+const OverviewContainer = styled.div`
+  display: flex;
 `;
 
 // #region IconWrapper constants
@@ -280,6 +286,8 @@ const EditMiniIcon = styled.div`
 `;
 
 const InfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
 `;
 
@@ -344,7 +352,7 @@ const ComponentContainer = styled.div`
 `;
 
 // #region ComponentImageWrapper constants
-const COMPONENT_IMAGE_WRAPPER_DIMENSIONS = 100;
+const COMPONENT_IMAGE_WRAPPER_DIMENSIONS = 150;
 const COMPONENT_IMAGE_WRAPPER_MARGIN = 10;
 // #endregion
 const ComponentImageWrapper = styled.div`
@@ -593,26 +601,27 @@ class Preview extends React.PureComponent<Props, State> {
       <Container ref={r => this.containerRef = r} className={selectedType.name}>
         <Title>Preview</Title>
         <ContentContainer>
+          <OverviewContainer>
+            <IconWrapper onClick={this.onOpenIconPicker} className={selectedType.name}>
+              <Icon src={this.props.selectedIcon} />
+              <EditMiniIcon className={`icon-edit ${selectedType.name}`} />
+            </IconWrapper>
 
-          <IconWrapper onClick={this.onOpenIconPicker} className={selectedType.name}>
-            <Icon src={this.props.selectedIcon} />
-            <EditMiniIcon className={`icon-edit ${selectedType.name}`} />
-          </IconWrapper>
-
-          <InfoContainer>
-            <TextEdit
-              value={this.props.name}
-              textAreaClass={Name}
-              onChange={this.props.onNameChange}
-              selectedType={this.props.selectedType}
-            />
-            <Description className={selectedType.name}>
-              {selectedComponents.map(component => component.display.description + '. ')}
-            </Description>
-            <ComponentContainer>
-              {content}
-            </ComponentContainer>
-          </InfoContainer>
+            <InfoContainer>
+              <TextEdit
+                value={this.props.name}
+                textAreaClass={Name}
+                onChange={this.props.onNameChange}
+                selectedType={this.props.selectedType}
+              />
+              <Description className={selectedType.name}>
+                {selectedComponents.map(component => component.display.description + '. ')}
+              </Description>
+            </InfoContainer>
+          </OverviewContainer>
+          <ComponentContainer>
+            {content}
+          </ComponentContainer>
         </ContentContainer>
 
         {/* <StatsContainer
