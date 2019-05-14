@@ -356,6 +356,7 @@ const COMPONENT_IMAGE_WRAPPER_DIMENSIONS = 150;
 const COMPONENT_IMAGE_WRAPPER_MARGIN = 10;
 // #endregion
 const ComponentImageWrapper = styled.div`
+  flex: 0 0 auto;
   position: relative;
   width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
   height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
@@ -408,6 +409,7 @@ const ComponentImage = styled.img`
 
 const CategoryContainer = styled.div`
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
   align-items: center;
@@ -427,6 +429,7 @@ const CATEGORY_TITLE_FONT_SIZE = 26;
 const CATEGORY_TITLE_LETTER_SPACING = 2;
 // #endregion
 const CategoryTitle = styled.div`
+  flex: 0 0 auto;
   text-transform: uppercase;
   text-align: center;
   font-family: TradeWinds;
