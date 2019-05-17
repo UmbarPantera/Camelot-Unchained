@@ -9,7 +9,13 @@ import { styled } from '@csegames/linaria/react';
 import { hideContextMenu } from 'actions/contextMenu';
 import { showModal } from 'utils/DynamicModal';
 
-const DeleteButton = styled.div`
+const ContextMenuContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+
+const MenuButton = styled.div`
   cursor: pointer;
   color: white;
   pointer-events: all;
@@ -118,6 +124,7 @@ const ModalButton = styled.div`
 
 export interface Props {
   onDeleteClick: () => void;
+  onCopyClick: () => void;
 }
 
 // tslint:disable-next-line:function-name
@@ -148,6 +155,9 @@ export function AbilityContextMenu(props: Props) {
     });
   }
   return (
-    <DeleteButton onClick={onOpenModal}>Delete</DeleteButton>
+    <ContextMenuContainer>
+      <MenuButton onClick={onOpenModal}>Delete</MenuButton>
+      <MenuButton onClick={() => { hideContextMenu(); props.onCopyClick(); }}>Copy Name</MenuButton>
+    </ContextMenuContainer>
   );
 }

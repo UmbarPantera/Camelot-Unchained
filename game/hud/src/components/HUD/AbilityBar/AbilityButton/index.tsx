@@ -18,6 +18,7 @@ import {
 } from './lib';
 import { webAPI } from '@csegames/camelot-unchained';
 import { AbilityContextMenu } from './AbilityContextMenu';
+import { copyToClipboard } from '../../../utils/Copy';
 export * from './lib';
 
 declare const toastr: any;
@@ -147,7 +148,11 @@ class AbilityButton extends React.Component<AbilityButtonProps, AbilityButtonSta
         this.props.numberOfAbilities > 1 ?
         <ContextMenu
           type='content'
-          getContent={() => <AbilityContextMenu onDeleteClick={() => this.onDeleteClick(this.props.abilityInfo.id)} />}>
+          getContent={() => <AbilityContextMenu
+            onDeleteClick={() => this.onDeleteClick(this.props.abilityInfo.id)}
+            onCopyClick={() => this.onCopyClick(this.props.name)}
+          />}
+          >
           <div>
             <AbilityButtonView
               ability={this.props.abilityInfo}
@@ -418,6 +423,10 @@ class AbilityButton extends React.Component<AbilityButtonProps, AbilityButtonSta
       const errorMessage = JSON.parse(res.data).FieldCodes[0].AbilityResult.Details;
       toastr.error(errorMessage, 'Oh no!!', { timeout: 3000 });
     }
+  }
+
+  private onCopyClick = (name: string) => {
+    copyToClipboard(name);
   }
 }
 
