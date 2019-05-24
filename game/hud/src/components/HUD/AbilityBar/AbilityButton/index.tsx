@@ -149,8 +149,9 @@ class AbilityButton extends React.Component<AbilityButtonProps, AbilityButtonSta
         <ContextMenu
           type='content'
           getContent={() => <AbilityContextMenu
+            abilityID={props.abilityInfo.id}
             onDeleteClick={() => this.onDeleteClick(this.props.abilityInfo.id)}
-            onCopyClick={() => this.onCopyClick(this.props.name)}
+            onCopyClick={this.onCopyClick}
           />}
           >
           <div>

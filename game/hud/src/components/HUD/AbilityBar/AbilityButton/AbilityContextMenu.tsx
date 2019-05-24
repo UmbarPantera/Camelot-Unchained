@@ -4,10 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as React from 'react';
+import React, { useState } from 'react';
+import gql from 'graphql-tag';
 import { styled } from '@csegames/linaria/react';
+import { GraphQL, GraphQLResult } from '@csegames/camelot-unchained/lib/graphql/react';
 import { hideContextMenu } from 'actions/contextMenu';
 import { showModal } from 'utils/DynamicModal';
+import { AbilityComponentFragment } from 'gql/fragments/AbilityComponentFragment';
+import { AbilityBookQuery } from 'gql/interfaces';
+
 
 const ContextMenuContainer = styled.div`
   display: flex;
@@ -122,13 +127,50 @@ const ModalButton = styled.div`
   }
 `;
 
+const query = gql`
+  query AbilityMenuQuery {
+    myCharacter {
+      abilities {
+        id
+        abilityComponents {
+          ...AbilityComponent
+        }
+      }
+    }
+  }
+  ${AbilityComponentFragment}
+`;
+
 export interface Props {
+  abilityID: number;
   onDeleteClick: () => void;
-  onCopyClick: () => void;
+  onCopyClick: (value: string) => void;
 }
+
+export interface State {
+  loading: boolean;
+  abilities: AbilityBookQuery.Abilities[];
+}
+
+const defaultMenuState: State = {
+  loading: true,
+  abilities: [],
+};
 
 // tslint:disable-next-line:function-name
 export function AbilityContextMenu(props: Props) {
+  let gql: GraphQLResult<AbilityBookQuery.Query>;
+  let retries = 0;
+  const [loading, setLoading] = useState(true);
+  const [clientAbilities, setClientAbilities] = useState(defaultMenuState.abilities);
+
+  function handleQueryResult(graphql: GraphQLResult<AbilityBookQuery.Query>) {
+    gql = graphql;
+    if (graphql.loading || !graphql.data) return graphql;
+    setLoading(false);
+    setClientAbilities(gql.data.myCharacter.abilities);
+  }
+
   function onDeleteClick(modalProps: { onClose: (result: any) => void }) {
     props.onDeleteClick();
     modalProps.onClose(true);
@@ -154,10 +196,34 @@ export function AbilityContextMenu(props: Props) {
       onClose: () => {},
     });
   }
+
+  function onCopyClick() {
+    if (loading) {
+      retries += 1;
+      if (retries > 10) {
+        props.onCopyClick('API is not responding');
+        hideContextMenu();
+      } else {
+        setTimeout(() => onCopyClick(), 200);
+      }
+    } else {
+      hideContextMenu();
+      const selectedAbility = clientAbilities.filter(ability => ability.id = props.abilityID);
+      const combinedComponentNames = selectedAbility[0].abilityComponents.reduce((result: string, component) => {
+        const description = result ? ('+').concat(component.display.name) : component.display.name;
+        return result.concat(description);
+      },'');
+      props.onCopyClick(combinedComponentNames ? combinedComponentNames : 'no name');
+    }
+  }
+
   return (
     <ContextMenuContainer>
+      <GraphQL
+      query={{ query }}
+      onQueryResult={handleQueryResult}/>
       <MenuButton onClick={onOpenModal}>Delete</MenuButton>
-      <MenuButton onClick={() => { hideContextMenu(); props.onCopyClick(); }}>Copy Name</MenuButton>
+      <MenuButton onClick={onCopyClick}>Copy Name</MenuButton>
     </ContextMenuContainer>
   );
 }
