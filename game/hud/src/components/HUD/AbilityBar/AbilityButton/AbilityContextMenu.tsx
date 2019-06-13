@@ -208,8 +208,10 @@ export function AbilityContextMenu(props: Props) {
       }
     } else {
       hideContextMenu();
-      const selectedAbility = clientAbilities.filter(ability => ability.id = props.abilityID);
-      const combinedComponentNames = selectedAbility[0].abilityComponents.reduce((result: string, component) => {
+      const selectedAbility = clientAbilities[props.abilityID].id === props.abilityID
+        ? clientAbilities[props.abilityID]
+        : clientAbilities.filter(ability => ability.id === props.abilityID)[0];
+      const combinedComponentNames = selectedAbility.abilityComponents.reduce((result: string, component) => {
         const description = result ? ('+').concat(component.display.name) : component.display.name;
         return result.concat(description);
       },'');
