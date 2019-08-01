@@ -15,6 +15,7 @@ import { IconPicker } from './IconPicker';
 import { AbilityBuilderQuery } from 'gql/interfaces';
 import { MID_SCALE, HD_SCALE } from 'fullscreen/lib/constants';
 import { AbilityType } from 'services/session/AbilityBuilderState';
+import { AbilityBuilderContext } from '..';
 
 // #region Container constants
 const CONTAINER_MARGIN = -100;
@@ -474,12 +475,19 @@ class Preview extends React.PureComponent<Props, State> {
     return (
       <>
       {this.state.showIconPicker &&
-        <IconPicker
-          top={this.state.iconPickerTop}
-          selectedAbilityType={this.props.selectedType}
-          onIconClick={this.onSelectedIconChange}
-          onCloseIconPicker={this.onCloseIconPicker}
-        />
+        <AbilityBuilderContext.Consumer>
+          {(abilityBuilderContext) => {
+            return (
+              <IconPicker
+                top={this.state.iconPickerTop}
+                selectedAbilityType={this.props.selectedType}
+                onIconClick={this.onSelectedIconChange}
+                onCloseIconPicker={this.onCloseIconPicker}
+                ownComponents={abilityBuilderContext.abilityComponents}
+              />
+            );
+          }}
+        </AbilityBuilderContext.Consumer>
       }
       <Container ref={r => this.containerRef = r} className={selectedType.name}>
         <Title>Preview</Title>

@@ -95,5 +95,11 @@ export function archetypeString(archetype: Archetype) {
       return 'Forest Stalker';
     case Archetype.WintersShadow:
       return 'Winter\'s Shadow';
+    case Archetype.Druid:
+      return 'Druid';
+    case Archetype.FlameWarden:
+      return 'Flame Warden';
+    case Archetype.WaveWeaver:
+      return 'Wave Weaver';
   }
 }
