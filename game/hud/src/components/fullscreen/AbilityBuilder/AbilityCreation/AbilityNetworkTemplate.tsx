@@ -244,6 +244,7 @@ export function AbilityNetworkTemplate(props: ComponentProps) {
         onNameChange={onNameChange}
         description={''}
         onDescriptionChange={onDescriptionChange}
+        dispatch={dispatch}
       />
       <CreateAbilityButton
         text={state.isModifying ? 'Modify Ability' : 'Create Ability'}

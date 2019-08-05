@@ -14,7 +14,7 @@ import { TextEdit } from './TextEdit';
 import { IconPicker } from './IconPicker';
 import { AbilityBuilderQuery } from 'gql/interfaces';
 import { MID_SCALE, HD_SCALE } from 'fullscreen/lib/constants';
-import { AbilityType } from 'services/session/AbilityBuilderState';
+import { AbilityType, Actions } from 'services/session/AbilityBuilderState';
 import { AbilityBuilderContext } from '..';
 
 // #region Container constants
@@ -345,7 +345,7 @@ const ComponentImageWrapper = styled.div`
   position: relative;
   width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
   height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS}px;
-  margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
+  margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN}px;
   pointer-events: all;
   &:after {
     content: '';
@@ -377,13 +377,13 @@ const ComponentImageWrapper = styled.div`
   @media (max-width: 2560px) {
     width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * MID_SCALE}px;
     height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * MID_SCALE}px;
-    margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * MID_SCALE}px;
   }
 
   @media (max-width: 1920px) {
     width: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * HD_SCALE}px;
     height: ${COMPONENT_IMAGE_WRAPPER_DIMENSIONS * HD_SCALE}px;
-    margin 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
+    margin: 0 ${COMPONENT_IMAGE_WRAPPER_MARGIN * HD_SCALE}px;
   }
 `;
 
@@ -446,6 +446,7 @@ export interface ComponentProps {
   onNameChange: (name: string) => void;
   onDescriptionChange: (description: string) => void;
   components: AbilityBuilderQuery.AbilityComponents[];
+  dispatch: (value: Actions) => void;
 }
 
 export type Props = InjectedProps & ComponentProps;
@@ -469,7 +470,7 @@ class Preview extends React.PureComponent<Props, State> {
   }
 
   public render() {
-    const { components, selectedType } = this.props;
+    const { components, selectedType, dispatch } = this.props;
     // const stats = this.getStats();
 
     return (
@@ -518,7 +519,10 @@ class Preview extends React.PureComponent<Props, State> {
                         selectedComponentsList={this.props.components}
                       />
                     }>
-                    <ComponentImageWrapper className={selectedType.name}>
+                    <ComponentImageWrapper
+                      className={selectedType.name}
+                      onClick={() => dispatch({ type: 'set-icon', icon: component.display.iconURL })}
+                    >
                       <ComponentImage src={component.display.iconURL} />
                     </ComponentImageWrapper>
                   </Tooltip>
