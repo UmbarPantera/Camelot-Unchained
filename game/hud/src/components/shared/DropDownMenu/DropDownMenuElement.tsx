@@ -273,6 +273,7 @@ export function DropDownMenuElement(props: Props): JSX.Element {
       checked={props.def.selected}
       customStyles={customStyles && customStyles.checkBoxStyles}
       dimensions={28}
+      checkSize={24}
     />
   );
   return (

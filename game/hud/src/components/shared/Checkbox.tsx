@@ -11,6 +11,7 @@ import { MID_SCALE, HD_SCALE } from 'fullscreen/lib/constants';
 
 export interface ContainerProps {
   dimensions: number;
+  checkSize: number;
 }
 
 // #region Container constants
@@ -23,7 +24,7 @@ const Container = styled.div<React.HTMLAttributes<HTMLDivElement> & ContainerPro
   justify-content: center;
   width: ${(props: ContainerProps) => props.dimensions}px;
   height: ${(props: ContainerProps) => props.dimensions}px;
-  font-size: ${(props: ContainerProps) => props.dimensions}px;
+  font-size: ${(props: ContainerProps) => props.checkSize ? props.checkSize + 'px' : 'inherit'};
   border-radius: ${CONTAINER_BORDER_RADIUS}px;
   background-color: #f2ddcb;
   cursor: pointer;
@@ -32,14 +33,14 @@ const Container = styled.div<React.HTMLAttributes<HTMLDivElement> & ContainerPro
   @media (max-width: 2560px) {
     width: ${(props: ContainerProps) => props.dimensions * MID_SCALE}px;
     height: ${(props: ContainerProps) => props.dimensions * MID_SCALE}px;
-    font-size: ${(props: ContainerProps) => props.dimensions * MID_SCALE}px;
+    font-size: ${(props: ContainerProps) => props.checkSize ? (props.checkSize * MID_SCALE) + 'px' : 'inherit'};
     border-radius: ${CONTAINER_BORDER_RADIUS * MID_SCALE}px;
   }
 
   @media (max-width: 1920px) {
     width: ${(props: ContainerProps) => props.dimensions * HD_SCALE }px;
     height: ${(props: ContainerProps) => props.dimensions * HD_SCALE}px;
-    font-size: ${(props: ContainerProps) => props.dimensions * HD_SCALE}px;
+    font-size: ${(props: ContainerProps) => props.checkSize ? (props.checkSize * HD_SCALE) + 'px' : 'inherit'};
     border-radius: ${CONTAINER_BORDER_RADIUS * HD_SCALE}px;
   }
 `;
@@ -56,6 +57,7 @@ export interface CheckBoxCustomStyles {
 export interface Props {
   checked: boolean;
   dimensions?: number;
+  checkSize?: number;
   customStyles?: Partial<CheckBoxCustomStyles>;
 }
 
@@ -65,6 +67,7 @@ export function Checkbox(props: Props) {
     <Container
       className={props.customStyles && props.customStyles.container}
       dimensions={props.dimensions ? props.dimensions : CONTAINER_DEFAULT_DIMENSIONS}
+      checkSize={props.checkSize}
     >
       {props.checked && <Check className={cx('fa fa-check', props.customStyles && props.customStyles.check)}></Check>}
     </Container>
